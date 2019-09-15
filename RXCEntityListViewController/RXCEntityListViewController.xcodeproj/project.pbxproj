@@ -7,22 +7,84 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
-		52A8ADF1BC2FB72B34425C31 /* Pods_RXCEntityListViewController.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 6AA43F23632396288D8A8747 /* Pods_RXCEntityListViewController.framework */; };
+		8040EE25232E5A3600BC8456 /* RXCDiffArray.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 8040EE24232E5A2E00BC8456 /* RXCDiffArray.framework */; };
+		8040EE26232E5A3600BC8456 /* RXCDiffArray.framework in Embed Frameworks */ = {isa = PBXBuildFile; fileRef = 8040EE24232E5A2E00BC8456 /* RXCDiffArray.framework */; settings = {ATTRIBUTES = (CodeSignOnCopy, RemoveHeadersOnCopy, ); }; };
+		8040EE2A232E62D000BC8456 /* RELListViewProtocol.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8040EE29232E62D000BC8456 /* RELListViewProtocol.swift */; };
+		8040EE43232E7EA400BC8456 /* AsyncDisplayKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 8040EE3D232E7E9C00BC8456 /* AsyncDisplayKit.framework */; };
+		8040EE44232E7EA400BC8456 /* AsyncDisplayKit.framework in Embed Frameworks */ = {isa = PBXBuildFile; fileRef = 8040EE3D232E7E9C00BC8456 /* AsyncDisplayKit.framework */; settings = {ATTRIBUTES = (CodeSignOnCopy, RemoveHeadersOnCopy, ); }; };
+		8044CB982321108A005FCC30 /* RELTableViewCellSelectorManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8044CB912321108A005FCC30 /* RELTableViewCellSelectorManager.swift */; };
+		8044CB992321108A005FCC30 /* RELTableViewCellSelector.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8044CB922321108A005FCC30 /* RELTableViewCellSelector.swift */; };
+		8044CB9A2321108A005FCC30 /* RELCard.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8044CB932321108A005FCC30 /* RELCard.swift */; };
+		8044CB9B2321108A005FCC30 /* RELDataBindableObjectProtocol.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8044CB952321108A005FCC30 /* RELDataBindableObjectProtocol.swift */; };
+		8044CB9C2321108A005FCC30 /* RELEntity.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8044CB962321108A005FCC30 /* RELEntity.swift */; };
+		8044CB9D2321108A005FCC30 /* RXCEntityListViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8044CB972321108A005FCC30 /* RXCEntityListViewController.swift */; };
+		8044CB9F2321145F005FCC30 /* RELCellSelectorPriority.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8044CB9E2321145F005FCC30 /* RELCellSelectorPriority.swift */; };
+		80CD3A7A2322319E00A7B039 /* RXCViewLikeObjectProtocol.swift in Sources */ = {isa = PBXBuildFile; fileRef = 80CD3A792322319E00A7B039 /* RXCViewLikeObjectProtocol.swift */; };
 		80E9917822E0CE0500A7E1DF /* AppDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = 80E9917722E0CE0500A7E1DF /* AppDelegate.swift */; };
 		80E9917A22E0CE0500A7E1DF /* ViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 80E9917922E0CE0500A7E1DF /* ViewController.swift */; };
 		80E9917D22E0CE0500A7E1DF /* Main.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 80E9917B22E0CE0500A7E1DF /* Main.storyboard */; };
 		80E9917F22E0CE0600A7E1DF /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 80E9917E22E0CE0600A7E1DF /* Assets.xcassets */; };
 		80E9918222E0CE0600A7E1DF /* LaunchScreen.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 80E9918022E0CE0600A7E1DF /* LaunchScreen.storyboard */; };
-		80E9918B22E0CE2400A7E1DF /* RELEntity.swift in Sources */ = {isa = PBXBuildFile; fileRef = 80E9918A22E0CE2400A7E1DF /* RELEntity.swift */; };
-		80E9918D22E0CE4B00A7E1DF /* RXCEntityListViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 80E9918C22E0CE4B00A7E1DF /* RXCEntityListViewController.swift */; };
-		80E9919022E0CECA00A7E1DF /* RELTableViewCellSelector.swift in Sources */ = {isa = PBXBuildFile; fileRef = 80E9918F22E0CECA00A7E1DF /* RELTableViewCellSelector.swift */; };
-		80E9919222E0D15800A7E1DF /* RELTableViewCellSelectorManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = 80E9919122E0D15800A7E1DF /* RELTableViewCellSelectorManager.swift */; };
-		80E9919522E0D50D00A7E1DF /* RELNeedBindDataObject.swift in Sources */ = {isa = PBXBuildFile; fileRef = 80E9919422E0D50D00A7E1DF /* RELNeedBindDataObject.swift */; };
 /* End PBXBuildFile section */
 
+/* Begin PBXContainerItemProxy section */
+		8040EE23232E5A2E00BC8456 /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = 8040EE1F232E5A2E00BC8456 /* RXCDiffArray.xcodeproj */;
+			proxyType = 2;
+			remoteGlobalIDString = 8033FEFF232E50CA00F1B233;
+			remoteInfo = RXCDiffArray;
+		};
+		8040EE3C232E7E9C00BC8456 /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = 8040EE36232E7E9C00BC8456 /* AsyncDisplayKit.xcodeproj */;
+			proxyType = 2;
+			remoteGlobalIDString = B35061DA1B010EDF0018CF92;
+			remoteInfo = AsyncDisplayKit;
+		};
+		8040EE3E232E7E9C00BC8456 /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = 8040EE36232E7E9C00BC8456 /* AsyncDisplayKit.xcodeproj */;
+			proxyType = 2;
+			remoteGlobalIDString = 058D09BC195D04C000B7D73C;
+			remoteInfo = AsyncDisplayKitTests;
+		};
+		8040EE40232E7E9C00BC8456 /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = 8040EE36232E7E9C00BC8456 /* AsyncDisplayKit.xcodeproj */;
+			proxyType = 2;
+			remoteGlobalIDString = 057D02BF1AC0A66700C7AC3C;
+			remoteInfo = AsyncDisplayKitTestHost;
+		};
+/* End PBXContainerItemProxy section */
+
+/* Begin PBXCopyFilesBuildPhase section */
+		8040EE27232E5A3600BC8456 /* Embed Frameworks */ = {
+			isa = PBXCopyFilesBuildPhase;
+			buildActionMask = 2147483647;
+			dstPath = "";
+			dstSubfolderSpec = 10;
+			files = (
+				8040EE26232E5A3600BC8456 /* RXCDiffArray.framework in Embed Frameworks */,
+				8040EE44232E7EA400BC8456 /* AsyncDisplayKit.framework in Embed Frameworks */,
+			);
+			name = "Embed Frameworks";
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXCopyFilesBuildPhase section */
+
 /* Begin PBXFileReference section */
-		6AA43F23632396288D8A8747 /* Pods_RXCEntityListViewController.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = Pods_RXCEntityListViewController.framework; sourceTree = BUILT_PRODUCTS_DIR; };
-		6B25F721B105F2D0AAC4ECA4 /* Pods-RXCEntityListViewController.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-RXCEntityListViewController.debug.xcconfig"; path = "Target Support Files/Pods-RXCEntityListViewController/Pods-RXCEntityListViewController.debug.xcconfig"; sourceTree = "<group>"; };
+		8040EE1F232E5A2E00BC8456 /* RXCDiffArray.xcodeproj */ = {isa = PBXFileReference; lastKnownFileType = "wrapper.pb-project"; name = RXCDiffArray.xcodeproj; path = ../../RXCDiffArray/RXCDiffArray.xcodeproj; sourceTree = "<group>"; };
+		8040EE29232E62D000BC8456 /* RELListViewProtocol.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RELListViewProtocol.swift; sourceTree = "<group>"; };
+		8040EE36232E7E9C00BC8456 /* AsyncDisplayKit.xcodeproj */ = {isa = PBXFileReference; lastKnownFileType = "wrapper.pb-project"; name = AsyncDisplayKit.xcodeproj; path = ../../../../../../Volumes/SGAPFS/Users/ruixingchen/Developer/OpenSource/Texture/AsyncDisplayKit.xcodeproj; sourceTree = "<group>"; };
+		8044CB912321108A005FCC30 /* RELTableViewCellSelectorManager.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = RELTableViewCellSelectorManager.swift; sourceTree = "<group>"; };
+		8044CB922321108A005FCC30 /* RELTableViewCellSelector.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = RELTableViewCellSelector.swift; sourceTree = "<group>"; };
+		8044CB932321108A005FCC30 /* RELCard.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = RELCard.swift; sourceTree = "<group>"; };
+		8044CB952321108A005FCC30 /* RELDataBindableObjectProtocol.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = RELDataBindableObjectProtocol.swift; sourceTree = "<group>"; };
+		8044CB962321108A005FCC30 /* RELEntity.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = RELEntity.swift; sourceTree = "<group>"; };
+		8044CB972321108A005FCC30 /* RXCEntityListViewController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = RXCEntityListViewController.swift; sourceTree = "<group>"; };
+		8044CB9E2321145F005FCC30 /* RELCellSelectorPriority.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RELCellSelectorPriority.swift; sourceTree = "<group>"; };
+		80CD3A792322319E00A7B039 /* RXCViewLikeObjectProtocol.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RXCViewLikeObjectProtocol.swift; sourceTree = "<group>"; };
 		80E9917422E0CE0500A7E1DF /* RXCEntityListViewController.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = RXCEntityListViewController.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		80E9917722E0CE0500A7E1DF /* AppDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppDelegate.swift; sourceTree = "<group>"; };
 		80E9917922E0CE0500A7E1DF /* ViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ViewController.swift; sourceTree = "<group>"; };
@@ -30,12 +92,6 @@
 		80E9917E22E0CE0600A7E1DF /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
 		80E9918122E0CE0600A7E1DF /* Base */ = {isa = PBXFileReference; lastKnownFileType = file.storyboard; name = Base; path = Base.lproj/LaunchScreen.storyboard; sourceTree = "<group>"; };
 		80E9918322E0CE0600A7E1DF /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
-		80E9918A22E0CE2400A7E1DF /* RELEntity.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RELEntity.swift; sourceTree = "<group>"; };
-		80E9918C22E0CE4B00A7E1DF /* RXCEntityListViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RXCEntityListViewController.swift; sourceTree = "<group>"; };
-		80E9918F22E0CECA00A7E1DF /* RELTableViewCellSelector.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RELTableViewCellSelector.swift; sourceTree = "<group>"; };
-		80E9919122E0D15800A7E1DF /* RELTableViewCellSelectorManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RELTableViewCellSelectorManager.swift; sourceTree = "<group>"; };
-		80E9919422E0D50D00A7E1DF /* RELNeedBindDataObject.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RELNeedBindDataObject.swift; sourceTree = "<group>"; };
-		AA37E769F4B1CDA08DF49B2B /* Pods-RXCEntityListViewController.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-RXCEntityListViewController.release.xcconfig"; path = "Target Support Files/Pods-RXCEntityListViewController/Pods-RXCEntityListViewController.release.xcconfig"; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -43,29 +99,74 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				52A8ADF1BC2FB72B34425C31 /* Pods_RXCEntityListViewController.framework in Frameworks */,
+				8040EE25232E5A3600BC8456 /* RXCDiffArray.framework in Frameworks */,
+				8040EE43232E7EA400BC8456 /* AsyncDisplayKit.framework in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
 /* End PBXFrameworksBuildPhase section */
 
 /* Begin PBXGroup section */
-		0640F6C0040888CDD6084817 /* Frameworks */ = {
+		8040EE20232E5A2E00BC8456 /* Products */ = {
 			isa = PBXGroup;
 			children = (
-				6AA43F23632396288D8A8747 /* Pods_RXCEntityListViewController.framework */,
+				8040EE24232E5A2E00BC8456 /* RXCDiffArray.framework */,
 			);
-			name = Frameworks;
+			name = Products;
+			sourceTree = "<group>";
+		};
+		8040EE37232E7E9C00BC8456 /* Products */ = {
+			isa = PBXGroup;
+			children = (
+				8040EE3D232E7E9C00BC8456 /* AsyncDisplayKit.framework */,
+				8040EE3F232E7E9C00BC8456 /* AsyncDisplayKitTests.xctest */,
+				8040EE41232E7E9C00BC8456 /* AsyncDisplayKitTestHost.app */,
+			);
+			name = Products;
+			sourceTree = "<group>";
+		};
+		8044CB8F2321108A005FCC30 /* Source */ = {
+			isa = PBXGroup;
+			children = (
+				8044CB932321108A005FCC30 /* RELCard.swift */,
+				8044CB962321108A005FCC30 /* RELEntity.swift */,
+				8044CB902321108A005FCC30 /* Selector */,
+				8044CB942321108A005FCC30 /* Protocol */,
+				8044CB972321108A005FCC30 /* RXCEntityListViewController.swift */,
+			);
+			name = Source;
+			path = ../Source;
+			sourceTree = "<group>";
+		};
+		8044CB902321108A005FCC30 /* Selector */ = {
+			isa = PBXGroup;
+			children = (
+				8044CB922321108A005FCC30 /* RELTableViewCellSelector.swift */,
+				8044CB912321108A005FCC30 /* RELTableViewCellSelectorManager.swift */,
+				8044CB9E2321145F005FCC30 /* RELCellSelectorPriority.swift */,
+			);
+			path = Selector;
+			sourceTree = "<group>";
+		};
+		8044CB942321108A005FCC30 /* Protocol */ = {
+			isa = PBXGroup;
+			children = (
+				8044CB952321108A005FCC30 /* RELDataBindableObjectProtocol.swift */,
+				80CD3A792322319E00A7B039 /* RXCViewLikeObjectProtocol.swift */,
+				8040EE29232E62D000BC8456 /* RELListViewProtocol.swift */,
+			);
+			path = Protocol;
 			sourceTree = "<group>";
 		};
 		80E9916B22E0CE0500A7E1DF = {
 			isa = PBXGroup;
 			children = (
-				80E9918922E0CE1200A7E1DF /* Source */,
+				8040EE36232E7E9C00BC8456 /* AsyncDisplayKit.xcodeproj */,
+				8040EE1F232E5A2E00BC8456 /* RXCDiffArray.xcodeproj */,
+				8044CB8F2321108A005FCC30 /* Source */,
 				80E9917622E0CE0500A7E1DF /* RXCEntityListViewController */,
 				80E9917522E0CE0500A7E1DF /* Products */,
 				9FAD52474426502E0209FE06 /* Pods */,
-				0640F6C0040888CDD6084817 /* Frameworks */,
 			);
 			sourceTree = "<group>";
 		};
@@ -90,39 +191,9 @@
 			path = RXCEntityListViewController;
 			sourceTree = "<group>";
 		};
-		80E9918922E0CE1200A7E1DF /* Source */ = {
-			isa = PBXGroup;
-			children = (
-				80E9919322E0D4CB00A7E1DF /* Protocol */,
-				80E9918E22E0CEB800A7E1DF /* Selector */,
-				80E9918A22E0CE2400A7E1DF /* RELEntity.swift */,
-				80E9918C22E0CE4B00A7E1DF /* RXCEntityListViewController.swift */,
-			);
-			path = Source;
-			sourceTree = "<group>";
-		};
-		80E9918E22E0CEB800A7E1DF /* Selector */ = {
-			isa = PBXGroup;
-			children = (
-				80E9918F22E0CECA00A7E1DF /* RELTableViewCellSelector.swift */,
-				80E9919122E0D15800A7E1DF /* RELTableViewCellSelectorManager.swift */,
-			);
-			path = Selector;
-			sourceTree = "<group>";
-		};
-		80E9919322E0D4CB00A7E1DF /* Protocol */ = {
-			isa = PBXGroup;
-			children = (
-				80E9919422E0D50D00A7E1DF /* RELNeedBindDataObject.swift */,
-			);
-			path = Protocol;
-			sourceTree = "<group>";
-		};
 		9FAD52474426502E0209FE06 /* Pods */ = {
 			isa = PBXGroup;
 			children = (
-				6B25F721B105F2D0AAC4ECA4 /* Pods-RXCEntityListViewController.debug.xcconfig */,
-				AA37E769F4B1CDA08DF49B2B /* Pods-RXCEntityListViewController.release.xcconfig */,
 			);
 			path = Pods;
 			sourceTree = "<group>";
@@ -134,11 +205,10 @@
 			isa = PBXNativeTarget;
 			buildConfigurationList = 80E9918622E0CE0600A7E1DF /* Build configuration list for PBXNativeTarget "RXCEntityListViewController" */;
 			buildPhases = (
-				E972D7294EA70B3CAAAEDC2B /* [CP] Check Pods Manifest.lock */,
 				80E9917022E0CE0500A7E1DF /* Sources */,
 				80E9917122E0CE0500A7E1DF /* Frameworks */,
 				80E9917222E0CE0500A7E1DF /* Resources */,
-				90AFA31763F1B7635BCF6421 /* [CP] Embed Pods Frameworks */,
+				8040EE27232E5A3600BC8456 /* Embed Frameworks */,
 			);
 			buildRules = (
 			);
@@ -175,12 +245,53 @@
 			mainGroup = 80E9916B22E0CE0500A7E1DF;
 			productRefGroup = 80E9917522E0CE0500A7E1DF /* Products */;
 			projectDirPath = "";
+			projectReferences = (
+				{
+					ProductGroup = 8040EE37232E7E9C00BC8456 /* Products */;
+					ProjectRef = 8040EE36232E7E9C00BC8456 /* AsyncDisplayKit.xcodeproj */;
+				},
+				{
+					ProductGroup = 8040EE20232E5A2E00BC8456 /* Products */;
+					ProjectRef = 8040EE1F232E5A2E00BC8456 /* RXCDiffArray.xcodeproj */;
+				},
+			);
 			projectRoot = "";
 			targets = (
 				80E9917322E0CE0500A7E1DF /* RXCEntityListViewController */,
 			);
 		};
 /* End PBXProject section */
+
+/* Begin PBXReferenceProxy section */
+		8040EE24232E5A2E00BC8456 /* RXCDiffArray.framework */ = {
+			isa = PBXReferenceProxy;
+			fileType = wrapper.framework;
+			path = RXCDiffArray.framework;
+			remoteRef = 8040EE23232E5A2E00BC8456 /* PBXContainerItemProxy */;
+			sourceTree = BUILT_PRODUCTS_DIR;
+		};
+		8040EE3D232E7E9C00BC8456 /* AsyncDisplayKit.framework */ = {
+			isa = PBXReferenceProxy;
+			fileType = wrapper.framework;
+			path = AsyncDisplayKit.framework;
+			remoteRef = 8040EE3C232E7E9C00BC8456 /* PBXContainerItemProxy */;
+			sourceTree = BUILT_PRODUCTS_DIR;
+		};
+		8040EE3F232E7E9C00BC8456 /* AsyncDisplayKitTests.xctest */ = {
+			isa = PBXReferenceProxy;
+			fileType = wrapper.cfbundle;
+			path = AsyncDisplayKitTests.xctest;
+			remoteRef = 8040EE3E232E7E9C00BC8456 /* PBXContainerItemProxy */;
+			sourceTree = BUILT_PRODUCTS_DIR;
+		};
+		8040EE41232E7E9C00BC8456 /* AsyncDisplayKitTestHost.app */ = {
+			isa = PBXReferenceProxy;
+			fileType = wrapper.application;
+			path = AsyncDisplayKitTestHost.app;
+			remoteRef = 8040EE40232E7E9C00BC8456 /* PBXContainerItemProxy */;
+			sourceTree = BUILT_PRODUCTS_DIR;
+		};
+/* End PBXReferenceProxy section */
 
 /* Begin PBXResourcesBuildPhase section */
 		80E9917222E0CE0500A7E1DF /* Resources */ = {
@@ -195,60 +306,22 @@
 		};
 /* End PBXResourcesBuildPhase section */
 
-/* Begin PBXShellScriptBuildPhase section */
-		90AFA31763F1B7635BCF6421 /* [CP] Embed Pods Frameworks */ = {
-			isa = PBXShellScriptBuildPhase;
-			buildActionMask = 2147483647;
-			files = (
-			);
-			inputFileListPaths = (
-				"${PODS_ROOT}/Target Support Files/Pods-RXCEntityListViewController/Pods-RXCEntityListViewController-frameworks-${CONFIGURATION}-input-files.xcfilelist",
-			);
-			name = "[CP] Embed Pods Frameworks";
-			outputFileListPaths = (
-				"${PODS_ROOT}/Target Support Files/Pods-RXCEntityListViewController/Pods-RXCEntityListViewController-frameworks-${CONFIGURATION}-output-files.xcfilelist",
-			);
-			runOnlyForDeploymentPostprocessing = 0;
-			shellPath = /bin/sh;
-			shellScript = "\"${PODS_ROOT}/Target Support Files/Pods-RXCEntityListViewController/Pods-RXCEntityListViewController-frameworks.sh\"\n";
-			showEnvVarsInLog = 0;
-		};
-		E972D7294EA70B3CAAAEDC2B /* [CP] Check Pods Manifest.lock */ = {
-			isa = PBXShellScriptBuildPhase;
-			buildActionMask = 2147483647;
-			files = (
-			);
-			inputFileListPaths = (
-			);
-			inputPaths = (
-				"${PODS_PODFILE_DIR_PATH}/Podfile.lock",
-				"${PODS_ROOT}/Manifest.lock",
-			);
-			name = "[CP] Check Pods Manifest.lock";
-			outputFileListPaths = (
-			);
-			outputPaths = (
-				"$(DERIVED_FILE_DIR)/Pods-RXCEntityListViewController-checkManifestLockResult.txt",
-			);
-			runOnlyForDeploymentPostprocessing = 0;
-			shellPath = /bin/sh;
-			shellScript = "diff \"${PODS_PODFILE_DIR_PATH}/Podfile.lock\" \"${PODS_ROOT}/Manifest.lock\" > /dev/null\nif [ $? != 0 ] ; then\n    # print error to STDERR\n    echo \"error: The sandbox is not in sync with the Podfile.lock. Run 'pod install' or update your CocoaPods installation.\" >&2\n    exit 1\nfi\n# This output is used by Xcode 'outputs' to avoid re-running this script phase.\necho \"SUCCESS\" > \"${SCRIPT_OUTPUT_FILE_0}\"\n";
-			showEnvVarsInLog = 0;
-		};
-/* End PBXShellScriptBuildPhase section */
-
 /* Begin PBXSourcesBuildPhase section */
 		80E9917022E0CE0500A7E1DF /* Sources */ = {
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				80E9919222E0D15800A7E1DF /* RELTableViewCellSelectorManager.swift in Sources */,
+				8044CB992321108A005FCC30 /* RELTableViewCellSelector.swift in Sources */,
 				80E9917A22E0CE0500A7E1DF /* ViewController.swift in Sources */,
+				8044CB982321108A005FCC30 /* RELTableViewCellSelectorManager.swift in Sources */,
+				8044CB9D2321108A005FCC30 /* RXCEntityListViewController.swift in Sources */,
+				80CD3A7A2322319E00A7B039 /* RXCViewLikeObjectProtocol.swift in Sources */,
+				8044CB9C2321108A005FCC30 /* RELEntity.swift in Sources */,
+				8044CB9F2321145F005FCC30 /* RELCellSelectorPriority.swift in Sources */,
+				8044CB9A2321108A005FCC30 /* RELCard.swift in Sources */,
+				8040EE2A232E62D000BC8456 /* RELListViewProtocol.swift in Sources */,
 				80E9917822E0CE0500A7E1DF /* AppDelegate.swift in Sources */,
-				80E9918B22E0CE2400A7E1DF /* RELEntity.swift in Sources */,
-				80E9918D22E0CE4B00A7E1DF /* RXCEntityListViewController.swift in Sources */,
-				80E9919522E0D50D00A7E1DF /* RELNeedBindDataObject.swift in Sources */,
-				80E9919022E0CECA00A7E1DF /* RELTableViewCellSelector.swift in Sources */,
+				8044CB9B2321108A005FCC30 /* RELDataBindableObjectProtocol.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -392,7 +465,6 @@
 		};
 		80E9918722E0CE0600A7E1DF /* Debug */ = {
 			isa = XCBuildConfiguration;
-			baseConfigurationReference = 6B25F721B105F2D0AAC4ECA4 /* Pods-RXCEntityListViewController.debug.xcconfig */;
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				CODE_SIGN_STYLE = Automatic;
@@ -405,6 +477,7 @@
 				);
 				PRODUCT_BUNDLE_IDENTIFIER = com.ruixingchenwork.RXCEntityListViewController;
 				PRODUCT_NAME = "$(TARGET_NAME)";
+				SWIFT_ACTIVE_COMPILATION_CONDITIONS = "DEBUG CanUseASDK";
 				SWIFT_VERSION = 5.0;
 				TARGETED_DEVICE_FAMILY = "1,2";
 			};
@@ -412,7 +485,6 @@
 		};
 		80E9918822E0CE0600A7E1DF /* Release */ = {
 			isa = XCBuildConfiguration;
-			baseConfigurationReference = AA37E769F4B1CDA08DF49B2B /* Pods-RXCEntityListViewController.release.xcconfig */;
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				CODE_SIGN_STYLE = Automatic;
@@ -425,6 +497,7 @@
 				);
 				PRODUCT_BUNDLE_IDENTIFIER = com.ruixingchenwork.RXCEntityListViewController;
 				PRODUCT_NAME = "$(TARGET_NAME)";
+				SWIFT_ACTIVE_COMPILATION_CONDITIONS = CanUseASDK;
 				SWIFT_VERSION = 5.0;
 				TARGETED_DEVICE_FAMILY = "1,2";
 			};

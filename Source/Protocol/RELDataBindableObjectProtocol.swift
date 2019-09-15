@@ -1,5 +1,5 @@
 //
-//  RELNeedBindDataObject.swift
+//  RELDataBindableObjectProtocol.swift
 //  RXCEntityListViewController
 //
 //  Created by ruixingchen on 7/19/19.
@@ -8,7 +8,7 @@
 
 import Foundation
 
-public protocol RELNeedBindDataObject {
+public protocol RELDataBindableObjectProtocol {
 
     func bindData(object:Any?, userInfo:[AnyHashable:Any]?)
 

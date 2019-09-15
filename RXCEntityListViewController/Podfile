@@ -6,6 +6,5 @@ target 'RXCEntityListViewController' do
   use_frameworks!
 
     pod 'Texture', '~> 2.8'
-    pod 'RXCDelegateArray', '1.0'
 
 end
