@@ -7,7 +7,7 @@
 //
 
 import UIKit
-#if CanUseASDK
+#if canImport(AsyncDisplayKit)
 import AsyncDisplayKit
 #endif
 

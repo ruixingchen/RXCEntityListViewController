@@ -13,12 +13,6 @@ import AsyncDisplayKit
 #if canImport(RXCDiffArray)
 import RXCDiffArray
 #endif
-#if canImport(MJRefresh)
-import MJRefresh
-#endif
-#if canImport(Alamofire)
-import Alamofire
-#endif
 
 #if !(CanUseASDK || canImport(AsyncDisplayKit))
 private protocol ASTableDataSource {}
@@ -44,15 +38,27 @@ public extension RXCEntityListViewController {
         ///will reload all content, set page to 1
         case reload
     }
+    
+    enum RequestType {
+        //case `init`
+        case headerRefresh
+        case footerRefresh
+    }
 }
 
 open class RXCEntityListViewController: UIViewController, ASTableDataSource,ASTableDelegate,ASCollectionDataSource,ASCollectionDelegate, UITableViewDataSource, UITableViewDelegate, UICollectionViewDataSource, UICollectionViewDelegate, RXCDiffArrayDelegate {
 
     public typealias DataList = RXCDiffArray<[RELCard], RELEntity>
 
+    //下面的别名是为了方便我们整合代码, 当需要修改的时候直接改这里就好, 降低复杂度, 为了通用性考虑, 默认直接采用AnyObject也是极好的
+    
+    public typealias ListRequestTask = AnyObject
+    public typealias ListRequestResponse = AnyObject
+
     open var listViewObject:RELListViewProtocol!
     #if (CanUseASDK || canImport(AsyncDisplayKit))
     open var tableNode:ASTableNode! {return self.listViewObject as? ASTableNode}
+    open var collectionNode:ASCollectionNode! {return self.listViewObject as? ASCollectionNode}
     #endif
     open var tableView:UITableView! {
         if let tv = self.listViewObject as? UITableView {return tv}
@@ -61,9 +67,6 @@ open class RXCEntityListViewController: UIViewController, ASTableDataSource,ASTa
         #endif
         return nil
     }
-    #if (CanUseASDK || canImport(AsyncDisplayKit))
-    open var collectionNode:ASCollectionNode! {return self.listViewObject as? ASCollectionNode}
-    #endif
     open var collectionView:UICollectionView! {
         if let cv = self.listViewObject as? UICollectionView {return cv}
         #if canImport(AsyncDisplayKit)
@@ -82,7 +85,10 @@ open class RXCEntityListViewController: UIViewController, ASTableDataSource,ASTa
     //MARK: - 数据 / Data
 
     open var dataList:DataList!
+    ///当请求到数据后, 按照顺序让数据处理器对新请求到的数据进行处理或者过滤
     open var dataProcessors:[AnyObject] = []
+    ///当前列表数据的最大页码, 为0表示当前没有进行请求
+    open var page:Int = 0
 
     //MARK: - 标记 / MARK
 
@@ -91,7 +97,21 @@ open class RXCEntityListViewController: UIViewController, ASTableDataSource,ASTa
 
     //MARK: - 请求相关
 
-    open var lastHeaderRequest:
+    open var lastHeaderRequest:ListRequestTask?
+    open var lastFooterRequest:ListRequestTask?
+    ///列表还有更多内容
+    open var hasMoreData:Bool = true
+    ///头部刷新组件指针, 用于确定是否安装了头部刷新组件
+    open var headerRefreshComponent:AnyObject?
+    ///底部刷新组件指针, 用于确定是否安装了底部刷新组件
+    open var footerRefreshComponent:AnyObject?
+    
+    //MARK: - 性能
+    
+    #if (CanUseASDK || canImport(AsyncDisplayKit))
+    ///添加或者更新Cell的时候可能会引起闪烁, 每次更新之前, 将要更新的Cell的位置加入这个数组, TableNode在返回Cell的时候会将这个Cell的neverShowPlaceholder设置为true, 一段时间后再改回falsse, 之后将该indexPath从本数组删除, 解决办法来自贝聊科技的文章
+    open var neverShowPlaceholderIndexPathes:[IndexPath] = []
+    #endif
 
     //MARK: - 初始化 / INIT
 
@@ -192,30 +212,62 @@ open class RXCEntityListViewController: UIViewController, ASTableDataSource,ASTa
 
     ///安装顶部刷新控件
     open func installHeaderRefreshComponent() {
-
+        //默认安装系统的刷新组件
+        guard self.headerRefreshComponent == nil else {return}
+        let refresh = UIRefreshControl()
+        refresh.addTarget(self, action: #selector(headerRefreshAction(sender:)), for: .valueChanged)
+        if let obj = self.listViewObject as? UITableView {
+            obj.refreshControl = refresh
+        }else if let obj = self.listViewObject as? UICollectionView {
+            obj.refreshControl = refresh
+        }else {
+            #if (CanUseASDK || canImport(AsyncDisplayKit))
+            if let obj = self.listViewObject as? ASTableNode {
+                obj.view.refreshControl = refresh
+            }else if let obj = self.listViewObject as? ASCollectionNode {
+                obj.view.refreshControl = refresh
+            }else {
+                assertionFailure("无法找到合适的ListViewObject类型来安装头部刷新组件:\(String(describing: self.listViewObject))")
+            }
+            #else
+            assertionFailure("无法找到合适的ListViewObject类型来安装头部刷新组件:\(String(describing: self.listViewObject))")
+            #endif
+        }
+        self.headerRefreshComponent = refresh
     }
 
     ///卸载顶部刷新控件
     open func uninstallHeaderRefreshComponent() {
-
+        guard self.headerRefreshComponent != nil else {return}
+        //这里由于ASDK也可以获取到指针, 直接用??一起获取了
+        if let obj = self.listViewObject as? UITableView ?? self.tableView, obj.refreshControl != nil {
+            obj.refreshControl = nil
+        }else if let obj = self.listViewObject as? UICollectionView ?? self.collectionView, obj.refreshControl != nil {
+            obj.refreshControl = nil
+        }else {
+            assertionFailure("无法找到合适的类型来卸载头部刷新组件:\(String(describing: self.listViewObject))")
+        }
+        self.headerRefreshComponent = nil
     }
 
     ///安装底部刷新控件
     open func installFooterRefreshComponent() {
-
+        
     }
 
     ///卸载底部刷新控件
     open func uninstallFooterRefreshComponent() {
-
+        
     }
 
     open func stopHeaderRefreshComponent() {
-
+        if let refresh = self.headerRefreshComponent as? UIRefreshControl {
+            refresh.endRefreshing()
+        }
     }
 
     open func stopFooterRefreshComponent() {
-
+        
     }
 
     //MARK: - TableView
@@ -247,7 +299,9 @@ open class RXCEntityListViewController: UIViewController, ASTableDataSource,ASTa
     }
 
     //MARK: - ASTableNode
-
+    
+    #if (CanUseASDK || canImport(AsyncDisplayKit))
+    
     public func numberOfSections(in tableNode: ASTableNode) -> Int {
         return self.dataList.count
     }
@@ -277,6 +331,8 @@ open class RXCEntityListViewController: UIViewController, ASTableDataSource,ASTa
             return ASCellNode()
         }
     }
+    
+    #endif
 
     //MARK: - RXCDiffArrayDelegate
 
@@ -286,20 +342,120 @@ open class RXCEntityListViewController: UIViewController, ASTableDataSource,ASTa
             object.reload(with: difference, animations: RDATableViewAnimations.automatic(), completion: nil)
         }else if let object = self.listViewObject as? UICollectionView {
             object.reload(with: difference, completion: nil)
+        }else {
+            #if (CanUseASDK || canImport(AsyncDisplayKit))
+            if let object = self.listViewObject as? ASTableNode {
+                object.reload(with: difference, animations: RDATableViewAnimations.automatic(), completion: nil)
+            }else if let object = self.listViewObject as? ASCollectionNode {
+                object.reload(with: difference, completion: nil)
+            }else {
+                assertionFailure("无法找到合适的ListView类型:\(String(describing: self.listViewObject))")
+            }
+            #else
+            assertionFailure("无法找到合适的ListView类型:\(String(describing: self.listViewObject))")
+            #endif
         }
-        #if (CanUseASDK || canImport(AsyncDisplayKit))
-        if let object = self.listViewObject as? ASTableNode {
-            object.reload(with: difference, animations: RDATableViewAnimations.automatic(), completion: nil)
-        }else if let object = self.listViewObject as? ASCollectionNode {
-            object.reload(with: difference, completion: nil)
-        }
-        #endif
-
     }
 
-    //MARK: - 请求相关
-
-
+    //MARK: - 请求状态
+    
+    func isHeaderRequesting()->Bool {
+        return self.lastHeaderRequest != nil
+    }
+    
+    func isFooterRequesting()->Bool {
+        return self.lastFooterRequest != nil
+    }
+    
+    func cancelHeaderRefreshRequest() {
+        if let req = self.lastHeaderRequest as? URLSessionTask {
+            req.cancel()
+            return
+        }
+        #if canImport(Alamofire)
+        if let req = self.lastHeaderRequest as? AnyObject {
+            return
+        }
+        #endif
+        fatalError("子类需要重写来实现功能")
+    }
+    
+    func cancelFooterRefreshRequest() {
+        if let req = self.lastHeaderRequest as? URLSessionTask {
+            req.cancel()
+            return
+        }
+        #if canImport(Alamofire)
+        if let req = self.lastHeaderRequest as? AnyObject {
+            return
+        }
+        #endif
+        fatalError("子类需要重写来实现功能")
+    }
+    
+    ///此时是否可以发起头部刷新请求
+    open func canTakeHeaderRefreshRequest()->Bool {
+        //一般情况下, 头部刷新优先级高于底部刷新, 头部刷新进行的时候, 直接取消底部刷新
+        return true
+    }
+    
+    ///此时是否可以发起底部刷新请求
+    open func canTakeFooterRefreshRequest()->Bool {
+        if self.isHeaderRequesting() {
+            return false
+        }
+        if !self.hasMoreData {
+            return false
+        }
+        return true
+    }
+    
+    //MARK: - 请求逻辑
+    
+    ///这个函数可以接收头部刷新传来的事件
+    @objc func headerRefreshAction(sender:Any?) {
+        //当执行头部刷新的时候, 先取消底部刷新, 防止干扰
+        guard self.canTakeHeaderRefreshRequest() else {return}
+        self.cancelFooterRefreshRequest()
+        self.stopFooterRefreshComponent()
+        
+        
+        
+    }
+    
+    open func listRequestUrl(requestType:RequestType, page:Int, userInfo:[AnyHashable:Any]?)->URL {
+        fatalError("本功能应由子类提供")
+    }
+    
+//    open func listRequestSpec(requestType:RequestType, page:Int, userInfo:[AnyHashable:Any]?) -> RELRequestSpec {
+//
+//    }
+    
+    //开始请求
+    open func startListRequest(requestSpec:RELRequestSpec, userInfo:[AnyHashable:Any]?) {
+        
+    }
+    
+    ///请求接收到回应
+    open func onListRequestResponse() {
+        
+    }
+    
+    ///请求的回应是错误信息
+    open func onListRequestResponseError() {
+        
+    }
+    
+    ///根据服务器的返回结果判断列表后面是否还有数据
+    open func hasMoreDataAfter(response:AnyObject)->Bool {
+        //由于很多时候判断后面是否还有数据的方法不尽相同, 这里采用一个函数来处理
+        fatalError("子类必须实现本方法")
+    }
+    
+    ///列表请求成功
+    open func onListRequestSuccess() {
+        //进入数据处理流程
+    }
 
 }
 
