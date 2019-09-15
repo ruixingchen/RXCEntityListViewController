@@ -410,6 +410,16 @@ open class RXCEntityListViewController: UIViewController, ASTableDataSource,ASTa
         return true
     }
     
+    ///结束一个头部刷新, 典型操作是结束刷新控件的刷新
+    open func endHeaderRefresh(userInfo:[AnyHashable:Any]?) {
+        self.stopHeaderRefreshComponent()
+    }
+    
+    ///结束一个底部刷新, 典型操作是结束刷新控件的刷新
+    open func endFooterRefresh(userInfo:[AnyHashable:Any]?) {
+        self.stopFooterRefreshComponent()
+    }
+    
     //MARK: - 请求逻辑
     
     ///这个函数可以接收头部刷新传来的事件
@@ -418,8 +428,6 @@ open class RXCEntityListViewController: UIViewController, ASTableDataSource,ASTa
         guard self.canTakeHeaderRefreshRequest() else {return}
         self.cancelFooterRefreshRequest()
         self.stopFooterRefreshComponent()
-        
-        
         
     }
     
@@ -447,7 +455,7 @@ open class RXCEntityListViewController: UIViewController, ASTableDataSource,ASTa
     }
     
     ///根据服务器的返回结果判断列表后面是否还有数据
-    open func hasMoreDataAfter(response:AnyObject)->Bool {
+    open func hasMoreDataAfter(response:ListRequestResponse)->Bool {
         //由于很多时候判断后面是否还有数据的方法不尽相同, 这里采用一个函数来处理
         fatalError("子类必须实现本方法")
     }
@@ -455,6 +463,25 @@ open class RXCEntityListViewController: UIViewController, ASTableDataSource,ASTa
     ///列表请求成功
     open func onListRequestSuccess() {
         //进入数据处理流程
+        //进入数据合并流程
+        //进入UI更新流程
+        //进入结束请求流程
+    }
+    
+    open func onListRequestDataProcessing() {
+        
+    }
+    
+    open func onListRequestDataMerge() {
+        
+    }
+    
+    open func onListRequestUpdateUI() {
+        
+    }
+    
+    open func onListRequestEnd() {
+        
     }
 
 }

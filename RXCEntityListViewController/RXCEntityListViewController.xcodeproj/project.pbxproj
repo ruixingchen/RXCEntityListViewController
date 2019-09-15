@@ -18,6 +18,7 @@
 		8044CB9D2321108A005FCC30 /* RXCEntityListViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8044CB972321108A005FCC30 /* RXCEntityListViewController.swift */; };
 		8044CB9F2321145F005FCC30 /* RELCellSelectorPriority.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8044CB9E2321145F005FCC30 /* RELCellSelectorPriority.swift */; };
 		80B615D8232EA1B600EC4C11 /* RELRequestSpec.swift in Sources */ = {isa = PBXBuildFile; fileRef = 80B615D7232EA1B600EC4C11 /* RELRequestSpec.swift */; };
+		80B615DA232EA99900EC4C11 /* RELListRequestDataProcessorProtocol.swift in Sources */ = {isa = PBXBuildFile; fileRef = 80B615D9232EA99900EC4C11 /* RELListRequestDataProcessorProtocol.swift */; };
 		80CD3A7A2322319E00A7B039 /* RXCViewLikeObjectProtocol.swift in Sources */ = {isa = PBXBuildFile; fileRef = 80CD3A792322319E00A7B039 /* RXCViewLikeObjectProtocol.swift */; };
 		80E9917822E0CE0500A7E1DF /* AppDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = 80E9917722E0CE0500A7E1DF /* AppDelegate.swift */; };
 		80E9917A22E0CE0500A7E1DF /* ViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 80E9917922E0CE0500A7E1DF /* ViewController.swift */; };
@@ -61,6 +62,7 @@
 		8044CB972321108A005FCC30 /* RXCEntityListViewController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = RXCEntityListViewController.swift; sourceTree = "<group>"; };
 		8044CB9E2321145F005FCC30 /* RELCellSelectorPriority.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RELCellSelectorPriority.swift; sourceTree = "<group>"; };
 		80B615D7232EA1B600EC4C11 /* RELRequestSpec.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RELRequestSpec.swift; sourceTree = "<group>"; };
+		80B615D9232EA99900EC4C11 /* RELListRequestDataProcessorProtocol.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RELListRequestDataProcessorProtocol.swift; sourceTree = "<group>"; };
 		80CD3A792322319E00A7B039 /* RXCViewLikeObjectProtocol.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RXCViewLikeObjectProtocol.swift; sourceTree = "<group>"; };
 		80E9917422E0CE0500A7E1DF /* RXCEntityListViewController.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = RXCEntityListViewController.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		80E9917722E0CE0500A7E1DF /* AppDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppDelegate.swift; sourceTree = "<group>"; };
@@ -100,6 +102,7 @@
 				8044CB942321108A005FCC30 /* Protocol */,
 				8044CB972321108A005FCC30 /* RXCEntityListViewController.swift */,
 				80B615D7232EA1B600EC4C11 /* RELRequestSpec.swift */,
+				80B615D9232EA99900EC4C11 /* RELListRequestDataProcessorProtocol.swift */,
 			);
 			name = Source;
 			path = ../Source;
@@ -257,6 +260,7 @@
 				8044CB982321108A005FCC30 /* RELTableViewCellSelectorManager.swift in Sources */,
 				8044CB9D2321108A005FCC30 /* RXCEntityListViewController.swift in Sources */,
 				80CD3A7A2322319E00A7B039 /* RXCViewLikeObjectProtocol.swift in Sources */,
+				80B615DA232EA99900EC4C11 /* RELListRequestDataProcessorProtocol.swift in Sources */,
 				8044CB9C2321108A005FCC30 /* RELEntity.swift in Sources */,
 				8044CB9F2321145F005FCC30 /* RELCellSelectorPriority.swift in Sources */,
 				8044CB9A2321108A005FCC30 /* RELCard.swift in Sources */,
