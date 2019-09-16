@@ -11,14 +11,20 @@ import Foundation
 ///描述一个列表页的请求
 open class RELRequestSpec {
     
-    var method:String = "GET"
-    let url:URL
-    var header:[String:String] = [:]
-    var body:Data?
+    open var method:String = "GET"
+    open var url:URL
+    open var header:[String:String] = [:]
+    open var body:Data?
+    open var multipartFormData:AnyObject?
     
-    init(url:URL) {
+    public init(url:URL) {
         self.url = url
     }
     
+}
+
+open class RELListRequestSpec: RELRequestSpec {
+    
+    open var requestType:RXCEntityListViewController.RequestType = RXCEntityListViewController.RequestType.headerRefresh
     
 }

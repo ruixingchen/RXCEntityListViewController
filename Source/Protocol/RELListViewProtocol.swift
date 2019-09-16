@@ -23,6 +23,9 @@ public protocol RELListViewProtocol: AnyObject {
 //    func rel_numberOfRows(inSection section: Int) -> Int
 //
 //    var rel_indexPathsForVisibleRows: [IndexPath] { get }
+    
+    @available(iOS 11.0, *)
+    func performBatchUpdates(_ updates: (() -> Void)?, completion: ((Bool) -> Void)?)
 
 }
 

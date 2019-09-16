@@ -440,47 +440,68 @@ open class RXCEntityListViewController: UIViewController, ASTableDataSource,ASTa
 //    }
     
     //开始请求
-    open func startListRequest(requestSpec:RELRequestSpec, userInfo:[AnyHashable:Any]?) {
+    open func startListRequest(requestSpec:RELListRequestSpec, userInfo:[AnyHashable:Any]?) {
         
     }
     
     ///请求接收到回应
-    open func onListRequestResponse() {
+    open func onListRequestResponse(requestSpec:RELListRequestSpec, response:ListRequestResponse) {
         
     }
     
     ///请求的回应是错误信息
-    open func onListRequestResponseError() {
+    open func onListRequestResponseError(requestSpec:RELListRequestSpec, response:ListRequestResponse) {
         
     }
     
     ///根据服务器的返回结果判断列表后面是否还有数据
-    open func hasMoreDataAfter(response:ListRequestResponse)->Bool {
+    open func hasMoreDataAfter(requestSpec:RELListRequestSpec, response:ListRequestResponse)->Bool {
         //由于很多时候判断后面是否还有数据的方法不尽相同, 这里采用一个函数来处理
         fatalError("子类必须实现本方法")
     }
     
     ///列表请求成功
-    open func onListRequestSuccess() {
+    open func onListRequestSuccess(requestSpec:RELListRequestSpec, response:ListRequestResponse) {
         //进入数据处理流程
         //进入数据合并流程
         //进入UI更新流程
         //进入结束请求流程
-    }
-    
-    open func onListRequestDataProcessing() {
+        //这里的数据处理, 数据合并, UI更新, 需要包裹在批量更新内部, 这样列表视图只会更新一次,减少性能问题和其他奇怪的问题
         
-    }
-    
-    open func onListRequestDataMerge() {
+        let enabled = UIView.areAnimationsEnabled
+        UIView.setAnimationsEnabled(false)
         
-    }
-    
-    open func onListRequestUpdateUI() {
+        objc_sync_enter(self.listViewObject as Any)
+        objc_sync_enter(self)
         
+        let updateClosure:()->Void = {
+            self.onListRequestDataProcessing(requestSpec: requestSpec, response: response)
+        }
+        
+        let completion:(Bool)->Void = {(finish) in
+            UIView.setAnimationsEnabled(enabled)
+            objc_sync_exit(self.listViewObject as Any)
+            objc_sync_exit(self)
+        }
+        
+        self.listViewObject.performBatchUpdates(updateClosure, completion: completion)
     }
     
-    open func onListRequestEnd() {
+    //下面三个方法是依次调用的, 每个方法需要保证要调用下一个方法, 或者子类override后将所有逻辑都自己处理也可以
+    
+    open func onListRequestDataProcessing(requestSpec:RELListRequestSpec, response:ListRequestResponse) {
+        self.onListRequestDataMerge(requestSpec: requestSpec, response: response)
+    }
+    
+    open func onListRequestDataMerge(requestSpec:RELListRequestSpec, response:ListRequestResponse) {
+        self.onListRequestUpdateUI(requestSpec: requestSpec, response: response)
+    }
+    
+    open func onListRequestUpdateUI(requestSpec:RELListRequestSpec, response:ListRequestResponse) {
+        self.onListRequestEnd(requestSpec: requestSpec, response: response)
+    }
+    
+    open func onListRequestEnd(requestSpec:RELListRequestSpec, response:ListRequestResponse) {
         
     }
 
