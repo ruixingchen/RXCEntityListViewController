@@ -3,12 +3,10 @@
 	archiveVersion = 1;
 	classes = {
 	};
-	objectVersion = 50;
+	objectVersion = 51;
 	objects = {
 
 /* Begin PBXBuildFile section */
-		8040EE25232E5A3600BC8456 /* RXCDiffArray.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 8040EE24232E5A2E00BC8456 /* RXCDiffArray.framework */; };
-		8040EE26232E5A3600BC8456 /* RXCDiffArray.framework in Embed Frameworks */ = {isa = PBXBuildFile; fileRef = 8040EE24232E5A2E00BC8456 /* RXCDiffArray.framework */; settings = {ATTRIBUTES = (CodeSignOnCopy, RemoveHeadersOnCopy, ); }; };
 		8040EE2A232E62D000BC8456 /* RELListViewProtocol.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8040EE29232E62D000BC8456 /* RELListViewProtocol.swift */; };
 		8044CB982321108A005FCC30 /* RELTableViewCellSelectorManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8044CB912321108A005FCC30 /* RELTableViewCellSelectorManager.swift */; };
 		8044CB992321108A005FCC30 /* RELTableViewCellSelector.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8044CB922321108A005FCC30 /* RELTableViewCellSelector.swift */; };
@@ -17,6 +15,7 @@
 		8044CB9C2321108A005FCC30 /* RELEntity.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8044CB962321108A005FCC30 /* RELEntity.swift */; };
 		8044CB9D2321108A005FCC30 /* RXCEntityListViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8044CB972321108A005FCC30 /* RXCEntityListViewController.swift */; };
 		8044CB9F2321145F005FCC30 /* RELCellSelectorPriority.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8044CB9E2321145F005FCC30 /* RELCellSelectorPriority.swift */; };
+		8066847A232F6BF5006A73B6 /* RELFirstTimeViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 80668479232F6BF5006A73B6 /* RELFirstTimeViewController.swift */; };
 		80B615D8232EA1B600EC4C11 /* RELRequestSpec.swift in Sources */ = {isa = PBXBuildFile; fileRef = 80B615D7232EA1B600EC4C11 /* RELRequestSpec.swift */; };
 		80B615DA232EA99900EC4C11 /* RELListRequestDataProcessorProtocol.swift in Sources */ = {isa = PBXBuildFile; fileRef = 80B615D9232EA99900EC4C11 /* RELListRequestDataProcessorProtocol.swift */; };
 		80CD3A7A2322319E00A7B039 /* RXCViewLikeObjectProtocol.swift in Sources */ = {isa = PBXBuildFile; fileRef = 80CD3A792322319E00A7B039 /* RXCViewLikeObjectProtocol.swift */; };
@@ -25,17 +24,8 @@
 		80E9917D22E0CE0500A7E1DF /* Main.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 80E9917B22E0CE0500A7E1DF /* Main.storyboard */; };
 		80E9917F22E0CE0600A7E1DF /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 80E9917E22E0CE0600A7E1DF /* Assets.xcassets */; };
 		80E9918222E0CE0600A7E1DF /* LaunchScreen.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 80E9918022E0CE0600A7E1DF /* LaunchScreen.storyboard */; };
+		C4DF5B0D21D28B95654715AE /* Pods_RXCEntityListViewController.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = F5FD1EB45556FB939244BD6D /* Pods_RXCEntityListViewController.framework */; };
 /* End PBXBuildFile section */
-
-/* Begin PBXContainerItemProxy section */
-		8040EE23232E5A2E00BC8456 /* PBXContainerItemProxy */ = {
-			isa = PBXContainerItemProxy;
-			containerPortal = 8040EE1F232E5A2E00BC8456 /* RXCDiffArray.xcodeproj */;
-			proxyType = 2;
-			remoteGlobalIDString = 8033FEFF232E50CA00F1B233;
-			remoteInfo = RXCDiffArray;
-		};
-/* End PBXContainerItemProxy section */
 
 /* Begin PBXCopyFilesBuildPhase section */
 		8040EE27232E5A3600BC8456 /* Embed Frameworks */ = {
@@ -44,7 +34,6 @@
 			dstPath = "";
 			dstSubfolderSpec = 10;
 			files = (
-				8040EE26232E5A3600BC8456 /* RXCDiffArray.framework in Embed Frameworks */,
 			);
 			name = "Embed Frameworks";
 			runOnlyForDeploymentPostprocessing = 0;
@@ -52,7 +41,8 @@
 /* End PBXCopyFilesBuildPhase section */
 
 /* Begin PBXFileReference section */
-		8040EE1F232E5A2E00BC8456 /* RXCDiffArray.xcodeproj */ = {isa = PBXFileReference; lastKnownFileType = "wrapper.pb-project"; name = RXCDiffArray.xcodeproj; path = ../../RXCDiffArray/RXCDiffArray.xcodeproj; sourceTree = "<group>"; };
+		1E9693EB3E374E77C16ECF25 /* Pods-RXCEntityListViewController.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-RXCEntityListViewController.debug.xcconfig"; path = "Target Support Files/Pods-RXCEntityListViewController/Pods-RXCEntityListViewController.debug.xcconfig"; sourceTree = "<group>"; };
+		52035848686A8E26A5F0D6D5 /* Pods-RXCEntityListViewController.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-RXCEntityListViewController.release.xcconfig"; path = "Target Support Files/Pods-RXCEntityListViewController/Pods-RXCEntityListViewController.release.xcconfig"; sourceTree = "<group>"; };
 		8040EE29232E62D000BC8456 /* RELListViewProtocol.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RELListViewProtocol.swift; sourceTree = "<group>"; };
 		8044CB912321108A005FCC30 /* RELTableViewCellSelectorManager.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = RELTableViewCellSelectorManager.swift; sourceTree = "<group>"; };
 		8044CB922321108A005FCC30 /* RELTableViewCellSelector.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = RELTableViewCellSelector.swift; sourceTree = "<group>"; };
@@ -61,6 +51,7 @@
 		8044CB962321108A005FCC30 /* RELEntity.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = RELEntity.swift; sourceTree = "<group>"; };
 		8044CB972321108A005FCC30 /* RXCEntityListViewController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = RXCEntityListViewController.swift; sourceTree = "<group>"; };
 		8044CB9E2321145F005FCC30 /* RELCellSelectorPriority.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RELCellSelectorPriority.swift; sourceTree = "<group>"; };
+		80668479232F6BF5006A73B6 /* RELFirstTimeViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RELFirstTimeViewController.swift; sourceTree = "<group>"; };
 		80B615D7232EA1B600EC4C11 /* RELRequestSpec.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RELRequestSpec.swift; sourceTree = "<group>"; };
 		80B615D9232EA99900EC4C11 /* RELListRequestDataProcessorProtocol.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RELListRequestDataProcessorProtocol.swift; sourceTree = "<group>"; };
 		80CD3A792322319E00A7B039 /* RXCViewLikeObjectProtocol.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RXCViewLikeObjectProtocol.swift; sourceTree = "<group>"; };
@@ -71,6 +62,7 @@
 		80E9917E22E0CE0600A7E1DF /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
 		80E9918122E0CE0600A7E1DF /* Base */ = {isa = PBXFileReference; lastKnownFileType = file.storyboard; name = Base; path = Base.lproj/LaunchScreen.storyboard; sourceTree = "<group>"; };
 		80E9918322E0CE0600A7E1DF /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
+		F5FD1EB45556FB939244BD6D /* Pods_RXCEntityListViewController.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = Pods_RXCEntityListViewController.framework; sourceTree = BUILT_PRODUCTS_DIR; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -78,31 +70,24 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				8040EE25232E5A3600BC8456 /* RXCDiffArray.framework in Frameworks */,
+				C4DF5B0D21D28B95654715AE /* Pods_RXCEntityListViewController.framework in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
 /* End PBXFrameworksBuildPhase section */
 
 /* Begin PBXGroup section */
-		8040EE20232E5A2E00BC8456 /* Products */ = {
-			isa = PBXGroup;
-			children = (
-				8040EE24232E5A2E00BC8456 /* RXCDiffArray.framework */,
-			);
-			name = Products;
-			sourceTree = "<group>";
-		};
 		8044CB8F2321108A005FCC30 /* Source */ = {
 			isa = PBXGroup;
 			children = (
 				8044CB932321108A005FCC30 /* RELCard.swift */,
 				8044CB962321108A005FCC30 /* RELEntity.swift */,
+				8053A7A3232F2EAB0041F84C /* Extension */,
 				8044CB902321108A005FCC30 /* Selector */,
 				8044CB942321108A005FCC30 /* Protocol */,
 				8044CB972321108A005FCC30 /* RXCEntityListViewController.swift */,
 				80B615D7232EA1B600EC4C11 /* RELRequestSpec.swift */,
-				80B615D9232EA99900EC4C11 /* RELListRequestDataProcessorProtocol.swift */,
+				80668479232F6BF5006A73B6 /* RELFirstTimeViewController.swift */,
 			);
 			name = Source;
 			path = ../Source;
@@ -111,9 +96,9 @@
 		8044CB902321108A005FCC30 /* Selector */ = {
 			isa = PBXGroup;
 			children = (
+				8044CB9E2321145F005FCC30 /* RELCellSelectorPriority.swift */,
 				8044CB922321108A005FCC30 /* RELTableViewCellSelector.swift */,
 				8044CB912321108A005FCC30 /* RELTableViewCellSelectorManager.swift */,
-				8044CB9E2321145F005FCC30 /* RELCellSelectorPriority.swift */,
 			);
 			path = Selector;
 			sourceTree = "<group>";
@@ -121,6 +106,7 @@
 		8044CB942321108A005FCC30 /* Protocol */ = {
 			isa = PBXGroup;
 			children = (
+				80B615D9232EA99900EC4C11 /* RELListRequestDataProcessorProtocol.swift */,
 				8044CB952321108A005FCC30 /* RELDataBindableObjectProtocol.swift */,
 				80CD3A792322319E00A7B039 /* RXCViewLikeObjectProtocol.swift */,
 				8040EE29232E62D000BC8456 /* RELListViewProtocol.swift */,
@@ -128,14 +114,21 @@
 			path = Protocol;
 			sourceTree = "<group>";
 		};
+		8053A7A3232F2EAB0041F84C /* Extension */ = {
+			isa = PBXGroup;
+			children = (
+			);
+			path = Extension;
+			sourceTree = "<group>";
+		};
 		80E9916B22E0CE0500A7E1DF = {
 			isa = PBXGroup;
 			children = (
-				8040EE1F232E5A2E00BC8456 /* RXCDiffArray.xcodeproj */,
 				8044CB8F2321108A005FCC30 /* Source */,
 				80E9917622E0CE0500A7E1DF /* RXCEntityListViewController */,
 				80E9917522E0CE0500A7E1DF /* Products */,
 				9FAD52474426502E0209FE06 /* Pods */,
+				954220BC646F906F42132DF0 /* Frameworks */,
 			);
 			sourceTree = "<group>";
 		};
@@ -160,9 +153,19 @@
 			path = RXCEntityListViewController;
 			sourceTree = "<group>";
 		};
+		954220BC646F906F42132DF0 /* Frameworks */ = {
+			isa = PBXGroup;
+			children = (
+				F5FD1EB45556FB939244BD6D /* Pods_RXCEntityListViewController.framework */,
+			);
+			name = Frameworks;
+			sourceTree = "<group>";
+		};
 		9FAD52474426502E0209FE06 /* Pods */ = {
 			isa = PBXGroup;
 			children = (
+				1E9693EB3E374E77C16ECF25 /* Pods-RXCEntityListViewController.debug.xcconfig */,
+				52035848686A8E26A5F0D6D5 /* Pods-RXCEntityListViewController.release.xcconfig */,
 			);
 			path = Pods;
 			sourceTree = "<group>";
@@ -174,10 +177,12 @@
 			isa = PBXNativeTarget;
 			buildConfigurationList = 80E9918622E0CE0600A7E1DF /* Build configuration list for PBXNativeTarget "RXCEntityListViewController" */;
 			buildPhases = (
+				6863842330AF5FD82DED199F /* [CP] Check Pods Manifest.lock */,
 				80E9917022E0CE0500A7E1DF /* Sources */,
 				80E9917122E0CE0500A7E1DF /* Frameworks */,
 				80E9917222E0CE0500A7E1DF /* Resources */,
 				8040EE27232E5A3600BC8456 /* Embed Frameworks */,
+				99F0FD638195415E35536366 /* [CP] Embed Pods Frameworks */,
 			);
 			buildRules = (
 			);
@@ -214,28 +219,12 @@
 			mainGroup = 80E9916B22E0CE0500A7E1DF;
 			productRefGroup = 80E9917522E0CE0500A7E1DF /* Products */;
 			projectDirPath = "";
-			projectReferences = (
-				{
-					ProductGroup = 8040EE20232E5A2E00BC8456 /* Products */;
-					ProjectRef = 8040EE1F232E5A2E00BC8456 /* RXCDiffArray.xcodeproj */;
-				},
-			);
 			projectRoot = "";
 			targets = (
 				80E9917322E0CE0500A7E1DF /* RXCEntityListViewController */,
 			);
 		};
 /* End PBXProject section */
-
-/* Begin PBXReferenceProxy section */
-		8040EE24232E5A2E00BC8456 /* RXCDiffArray.framework */ = {
-			isa = PBXReferenceProxy;
-			fileType = wrapper.framework;
-			path = RXCDiffArray.framework;
-			remoteRef = 8040EE23232E5A2E00BC8456 /* PBXContainerItemProxy */;
-			sourceTree = BUILT_PRODUCTS_DIR;
-		};
-/* End PBXReferenceProxy section */
 
 /* Begin PBXResourcesBuildPhase section */
 		80E9917222E0CE0500A7E1DF /* Resources */ = {
@@ -249,6 +238,48 @@
 			runOnlyForDeploymentPostprocessing = 0;
 		};
 /* End PBXResourcesBuildPhase section */
+
+/* Begin PBXShellScriptBuildPhase section */
+		6863842330AF5FD82DED199F /* [CP] Check Pods Manifest.lock */ = {
+			isa = PBXShellScriptBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			inputFileListPaths = (
+			);
+			inputPaths = (
+				"${PODS_PODFILE_DIR_PATH}/Podfile.lock",
+				"${PODS_ROOT}/Manifest.lock",
+			);
+			name = "[CP] Check Pods Manifest.lock";
+			outputFileListPaths = (
+			);
+			outputPaths = (
+				"$(DERIVED_FILE_DIR)/Pods-RXCEntityListViewController-checkManifestLockResult.txt",
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+			shellPath = /bin/sh;
+			shellScript = "diff \"${PODS_PODFILE_DIR_PATH}/Podfile.lock\" \"${PODS_ROOT}/Manifest.lock\" > /dev/null\nif [ $? != 0 ] ; then\n    # print error to STDERR\n    echo \"error: The sandbox is not in sync with the Podfile.lock. Run 'pod install' or update your CocoaPods installation.\" >&2\n    exit 1\nfi\n# This output is used by Xcode 'outputs' to avoid re-running this script phase.\necho \"SUCCESS\" > \"${SCRIPT_OUTPUT_FILE_0}\"\n";
+			showEnvVarsInLog = 0;
+		};
+		99F0FD638195415E35536366 /* [CP] Embed Pods Frameworks */ = {
+			isa = PBXShellScriptBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			inputFileListPaths = (
+				"${PODS_ROOT}/Target Support Files/Pods-RXCEntityListViewController/Pods-RXCEntityListViewController-frameworks-${CONFIGURATION}-input-files.xcfilelist",
+			);
+			name = "[CP] Embed Pods Frameworks";
+			outputFileListPaths = (
+				"${PODS_ROOT}/Target Support Files/Pods-RXCEntityListViewController/Pods-RXCEntityListViewController-frameworks-${CONFIGURATION}-output-files.xcfilelist",
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+			shellPath = /bin/sh;
+			shellScript = "\"${PODS_ROOT}/Target Support Files/Pods-RXCEntityListViewController/Pods-RXCEntityListViewController-frameworks.sh\"\n";
+			showEnvVarsInLog = 0;
+		};
+/* End PBXShellScriptBuildPhase section */
 
 /* Begin PBXSourcesBuildPhase section */
 		80E9917022E0CE0500A7E1DF /* Sources */ = {
@@ -264,6 +295,7 @@
 				8044CB9C2321108A005FCC30 /* RELEntity.swift in Sources */,
 				8044CB9F2321145F005FCC30 /* RELCellSelectorPriority.swift in Sources */,
 				8044CB9A2321108A005FCC30 /* RELCard.swift in Sources */,
+				8066847A232F6BF5006A73B6 /* RELFirstTimeViewController.swift in Sources */,
 				8040EE2A232E62D000BC8456 /* RELListViewProtocol.swift in Sources */,
 				80E9917822E0CE0500A7E1DF /* AppDelegate.swift in Sources */,
 				80B615D8232EA1B600EC4C11 /* RELRequestSpec.swift in Sources */,
@@ -411,12 +443,13 @@
 		};
 		80E9918722E0CE0600A7E1DF /* Debug */ = {
 			isa = XCBuildConfiguration;
+			baseConfigurationReference = 1E9693EB3E374E77C16ECF25 /* Pods-RXCEntityListViewController.debug.xcconfig */;
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				CODE_SIGN_STYLE = Automatic;
 				DEVELOPMENT_TEAM = 4RHHQE5755;
 				INFOPLIST_FILE = RXCEntityListViewController/Info.plist;
-				IPHONEOS_DEPLOYMENT_TARGET = 11;
+				IPHONEOS_DEPLOYMENT_TARGET = 10.0;
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",
 					"@executable_path/Frameworks",
@@ -431,12 +464,13 @@
 		};
 		80E9918822E0CE0600A7E1DF /* Release */ = {
 			isa = XCBuildConfiguration;
+			baseConfigurationReference = 52035848686A8E26A5F0D6D5 /* Pods-RXCEntityListViewController.release.xcconfig */;
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				CODE_SIGN_STYLE = Automatic;
 				DEVELOPMENT_TEAM = 4RHHQE5755;
 				INFOPLIST_FILE = RXCEntityListViewController/Info.plist;
-				IPHONEOS_DEPLOYMENT_TARGET = 11;
+				IPHONEOS_DEPLOYMENT_TARGET = 10.0;
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",
 					"@executable_path/Frameworks",

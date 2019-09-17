@@ -13,6 +13,9 @@ import AsyncDisplayKit
 #if canImport(RXCDiffArray)
 import RXCDiffArray
 #endif
+#if canImport(DifferenceKit)
+import DifferenceKit
+#endif
 
 #if !(CanUseASDK || canImport(AsyncDisplayKit))
 private protocol ASTableDataSource {}
@@ -44,11 +47,14 @@ public extension RXCEntityListViewController {
         case headerRefresh
         case footerRefresh
     }
+
 }
 
-open class RXCEntityListViewController: UIViewController, ASTableDataSource,ASTableDelegate,ASCollectionDataSource,ASCollectionDelegate, UITableViewDataSource, UITableViewDelegate, UICollectionViewDataSource, UICollectionViewDelegate, RXCDiffArrayDelegate {
+open class RXCEntityListViewController: RELFirstTimeViewController, ASTableDataSource,ASTableDelegate,ASCollectionDataSource,ASCollectionDelegate, UITableViewDataSource, UITableViewDelegate, UICollectionViewDataSource, UICollectionViewDelegate, RXCDiffArrayDelegate {
 
-    public typealias DataList = RXCDiffArray<[RELCard], RELEntity>
+    public typealias SectionELement = RELCard
+    public typealias RowElement = RELEntity
+    public typealias DataList = RXCDiffArray<ContiguousArray<RELCard>, RELEntity>
 
     //下面的别名是为了方便我们整合代码, 当需要修改的时候直接改这里就好, 降低复杂度, 为了通用性考虑, 默认直接采用AnyObject也是极好的
     
@@ -75,18 +81,16 @@ open class RXCEntityListViewController: UIViewController, ASTableDataSource,ASTa
         return nil
     }
 
-    //MARK: - UI
+    //MARK: - UI 及其相关
 
-    #if (CanUseASDK || canImport(AsyncDisplayKit))
-    open var useASDK:Bool
-    #endif
-    open var useCollectionView:Bool
+    ///cell的选择器, 需要在初始化方法中初始化之后使用
+    var cellSelectorManager:RELCellSelectorManager!
 
     //MARK: - 数据 / Data
 
     open var dataList:DataList!
     ///当请求到数据后, 按照顺序让数据处理器对新请求到的数据进行处理或者过滤
-    open var dataProcessors:[AnyObject] = []
+    open var dataProcessors:[RELListRequestDataProcessorProtocol] = []
     ///当前列表数据的最大页码, 为0表示当前没有进行请求
     open var page:Int = 0
 
@@ -94,6 +98,11 @@ open class RXCEntityListViewController: UIViewController, ASTableDataSource,ASTa
 
     ///自动内容控制，当数据源发生变化的时候自动更新ListView
     open var autoContentControl:Bool = true
+
+    #if (CanUseASDK || canImport(AsyncDisplayKit))
+    open var useASDK:Bool
+    #endif
+    open var useCollectionView:Bool
 
     //MARK: - 请求相关
 
@@ -120,15 +129,20 @@ open class RXCEntityListViewController: UIViewController, ASTableDataSource,ASTa
         self.useASDK = useASDK
         self.useCollectionView = useCollectionView
         super.init(nibName: nil, bundle: nil)
+        //这里的初始化顺序不要改
+        self.initCellSelectorManager()
         self.initListView()
         self.initDataList()
+        self.initDataProcessors()
     }
     #else
     public init(style:UITableView.Style, useCollectionView:Bool) {
         self.useCollectionView = useCollectionView
         super.init(nibName: nil, bundle: nil)
+        self.initCellSelectorManager()
         self.initListView()
         self.initDataList()
+        self.initDataProcessors()
     }
     #endif
 
@@ -136,10 +150,18 @@ open class RXCEntityListViewController: UIViewController, ASTableDataSource,ASTa
         fatalError("init(coder:) has not been implemented")
     }
 
+    open func initCellSelectorManager() {
+        self.cellSelectorManager = RELCellSelectorManager()
+        //子类可以override之后注册需要的选择器
+    }
+
     open func initDataList() {
         //默认没有数据
+        //初始化的时候有数据, 则必须先调用一次reloadData(), 否则可能导致UI和数据源不同步
+        //如果是UICollectionView, 需要执行注册函数
         self.dataList = DataList()
         self.dataList.delegate = self
+        self.listViewObject.rel_reloadData()
     }
 
     open func initListView() {
@@ -168,6 +190,8 @@ open class RXCEntityListViewController: UIViewController, ASTableDataSource,ASTa
             cv.dataSource = self
             cv.delegate = self
             self.listViewObject = cv
+            //如果是UICollectionView, 我们需要注册Cell
+            self.registerCellForUICollectionView()
         }else {
             let tv = UITableView()
             tv.dataSource = self
@@ -176,33 +200,56 @@ open class RXCEntityListViewController: UIViewController, ASTableDataSource,ASTa
         }
     }
 
+    ///如果是UICollectionView, 需要在显示之前执行注册Cell的操作, 默认是让CellSelectorManager自己去处理
+    open func registerCellForUICollectionView() {
+        if let view = self.collectionView {
+            self.cellSelectorManager.collectionViewRegister(collectionView: view)
+        }
+    }
+
+    open func initDataProcessors() {
+
+    }
+
     //MARK: - 生命周期 / LifeCycle
 
     open override func viewDidLoad() {
         super.viewDidLoad()
-        self.setupListViewOnViewDidLoad()
-        #if (CanUseASDK || canImport(AsyncDisplayKit))
-        if let node = self.listViewObject as? ASDisplayNode {
-            self.view.addSubnode(node)
-        }
-        #endif
+        self.setupListViewOnViewDidLoadBeforeAdded()
         if let _view = self.listViewObject as? UIView {
             self.view.addSubview(_view)
+        }else {
+            #if (CanUseASDK || canImport(AsyncDisplayKit))
+            if let node = self.listViewObject as? ASDisplayNode {
+                self.view.addSubnode(node)
+            }
+            #endif
         }
 
     }
 
-    open func setupListViewOnViewDidLoad() {
+    ///在添加到View之前最后一次设置ListView的各项属性
+    open func setupListViewOnViewDidLoadBeforeAdded() {
 
     }
 
     open override func viewWillAppear(_ animated: Bool) {
         super.viewWillAppear(animated)
+
+    }
+
+    open override func viewWillAppear_first(_ animated: Bool) {
+        super.viewWillAppear_first(animated)
         //第一次出现的时候请求数据
+
     }
 
     open override func viewWillLayoutSubviews() {
         super.viewWillLayoutSubviews()
+        self.layoutListView()
+    }
+
+    open func layoutListView() {
         if let likeView = self.listViewObject as? RXCViewLikeObjectProtocol {
             likeView.frame = self.view.bounds
         }
@@ -336,24 +383,10 @@ open class RXCEntityListViewController: UIViewController, ASTableDataSource,ASTa
 
     //MARK: - RXCDiffArrayDelegate
 
-    public func diffArray<SectionContainer, RowElement>(array: RXCDiffArray<SectionContainer, RowElement>, didChange difference: RDADifference<SectionContainer.Element, RowElement>) where SectionContainer : RangeReplaceableCollection {
-
-        if let object = self.listViewObject as? UITableView {
-            object.reload(with: difference, animations: RDATableViewAnimations.automatic(), completion: nil)
-        }else if let object = self.listViewObject as? UICollectionView {
-            object.reload(with: difference, completion: nil)
-        }else {
-            #if (CanUseASDK || canImport(AsyncDisplayKit))
-            if let object = self.listViewObject as? ASTableNode {
-                object.reload(with: difference, animations: RDATableViewAnimations.automatic(), completion: nil)
-            }else if let object = self.listViewObject as? ASCollectionNode {
-                object.reload(with: difference, completion: nil)
-            }else {
-                assertionFailure("无法找到合适的ListView类型:\(String(describing: self.listViewObject))")
-            }
-            #else
-            assertionFailure("无法找到合适的ListView类型:\(String(describing: self.listViewObject))")
-            #endif
+    public func diffArray<SectionContainer, RowElement>(array: RXCDiffArray<SectionContainer, RowElement>, didChange difference: RDADifference<SectionContainer.Element, RowElement>, userInfo: [AnyHashable : Any]?) where SectionContainer : RangeReplaceableCollection {
+        let batch = userInfo?["batch"] as? Bool ?? true
+        self.listViewObject.reload(userInfo: userInfo, with: difference, animations: RDATableViewAnimations.automatic(), batch: batch) { (finish) in
+            print("差异映射UI结束: \(finish)")
         }
     }
 
@@ -428,75 +461,96 @@ open class RXCEntityListViewController: UIViewController, ASTableDataSource,ASTa
         guard self.canTakeHeaderRefreshRequest() else {return}
         self.cancelFooterRefreshRequest()
         self.stopFooterRefreshComponent()
-        
     }
-    
+
+    ///前置请求, 有些界面需要有前置请求, 根据前置请求的结果来决定列表页的接口
+    func initRequest() {
+        //请求完毕后安装底部刷新控件, 之后就能正常启用列表请求的逻辑
+    }
+
+    ///返回列表页请求的URL
     open func listRequestUrl(requestType:RequestType, page:Int, userInfo:[AnyHashable:Any]?)->URL {
-        fatalError("本功能应由子类提供")
+        fatalError("本方法应由子类提供实现")
     }
-    
-//    open func listRequestSpec(requestType:RequestType, page:Int, userInfo:[AnyHashable:Any]?) -> RELRequestSpec {
-//
-//    }
+
+    ///返回列表页请求的描述对象
+    open func listRequestSpec(requestType:RequestType, page:Int, userInfo:[AnyHashable:Any]?) -> RELRequestSpec {
+        fatalError("稍等实现")
+    }
     
     //开始请求
     open func startListRequest(requestSpec:RELListRequestSpec, userInfo:[AnyHashable:Any]?) {
-        
+        fatalError("本方法应由子类提供实现")
+        //默认请求到的数据是一个数组, 至于数组内部的对象则根据请求接口不一样而不一样
     }
     
     ///请求接收到回应
-    open func onListRequestResponse(requestSpec:RELListRequestSpec, response:ListRequestResponse) {
-        
+    open func onListRequestResponse(requestSpec:RELListRequestSpec, response:ListRequestResponse, userInfo:[AnyHashable:Any]?) {
+
     }
     
     ///请求的回应是错误信息
-    open func onListRequestResponseError(requestSpec:RELListRequestSpec, response:ListRequestResponse) {
-        
+    open func onListRequestResponseError(requestSpec:RELListRequestSpec, response:ListRequestResponse, userInfo:[AnyHashable:Any]?) {
+
     }
     
     ///根据服务器的返回结果判断列表后面是否还有数据
-    open func hasMoreDataAfter(requestSpec:RELListRequestSpec, response:ListRequestResponse)->Bool {
+    open func hasMoreDataAfter(requestSpec:RELListRequestSpec, response:ListRequestResponse, userInfo:[AnyHashable:Any]?)->Bool {
         //由于很多时候判断后面是否还有数据的方法不尽相同, 这里采用一个函数来处理
-        fatalError("子类必须实现本方法")
+        fatalError("本方法应由子类提供实现")
     }
     
     ///列表请求成功
-    open func onListRequestSuccess(requestSpec:RELListRequestSpec, response:ListRequestResponse) {
-        //进入数据处理流程
-        //进入数据合并流程
-        //进入UI更新流程
-        //进入结束请求流程
-        //这里的数据处理, 数据合并, UI更新, 需要包裹在批量更新内部, 这样列表视图只会更新一次,减少性能问题和其他奇怪的问题
-        
-        let enabled = UIView.areAnimationsEnabled
-        UIView.setAnimationsEnabled(false)
+    open func onListRequestSuccess(requestSpec:RELListRequestSpec, response:ListRequestResponse, userInfo:[AnyHashable:Any]?) {
+        //数据处理流程
+        //数据合并流程
+        //UI更新流程
+        //结束请求流程
+
+        //由于本地列表的数据不可能很多, 最多最多最多也就1k-2k这个数量级, 我们采用diff来实现数据和UI同步, 采用DifferenceKit来实现
+
+        let animated = userInfo?["animated"] as? Bool ?? true
+        let enabledSave = UIView.areAnimationsEnabled
+        UIView.setAnimationsEnabled(animated)
         
         objc_sync_enter(self.listViewObject as Any)
         objc_sync_enter(self)
-        
-        let updateClosure:()->Void = {
+
+        let diffArray = self.dataList.batchWithDifferenceKit {
+            //注意, 数据处理内部如果要操作本地列表数据, 一定要禁用DataList的通知
             self.onListRequestDataProcessing(requestSpec: requestSpec, response: response)
         }
-        
-        let completion:(Bool)->Void = {(finish) in
-            UIView.setAnimationsEnabled(enabled)
-            objc_sync_exit(self.listViewObject as Any)
-            objc_sync_exit(self)
+        for i in diffArray {
+            if let data = i.dk_finalDataForCurrentStep {
+                self.dataList.rda_removeAllSection(userInfo: [DataList.Key.notify: false], where: {_ in true})
+                self.dataList.rda_appendSection(contentsOf: data, userInfo: [DataList.Key.notify: false])
+            }
+            self.listViewObject.reload(userInfo: nil, with: i, animations: RDATableViewAnimations.automatic(), batch: true) { (finish) in
+                print("数据Diff更新UI完成")
+            }
         }
-        
-        self.listViewObject.performBatchUpdates(updateClosure, completion: completion)
+
+        UIView.setAnimationsEnabled(enabledSave)
+        objc_sync_exit(self.listViewObject as Any)
+        objc_sync_exit(self)
     }
     
     //下面三个方法是依次调用的, 每个方法需要保证要调用下一个方法, 或者子类override后将所有逻辑都自己处理也可以
-    
+
+    ///数据处理阶段, 这个阶段将对服务器传来的数据进行过滤, 同时也可能会对现有列表进行修改, 比如删除重复项
     open func onListRequestDataProcessing(requestSpec:RELListRequestSpec, response:ListRequestResponse) {
+        for i in self.dataProcessors {
+
+        }
         self.onListRequestDataMerge(requestSpec: requestSpec, response: response)
     }
-    
+
+    ///数据合并阶段, 这个阶段将服务器传来的数据合并到现有的列表中, 这个阶段不应该对数据做修改
     open func onListRequestDataMerge(requestSpec:RELListRequestSpec, response:ListRequestResponse) {
         self.onListRequestUpdateUI(requestSpec: requestSpec, response: response)
     }
-    
+
+    ///更新UI阶段
     open func onListRequestUpdateUI(requestSpec:RELListRequestSpec, response:ListRequestResponse) {
         self.onListRequestEnd(requestSpec: requestSpec, response: response)
     }

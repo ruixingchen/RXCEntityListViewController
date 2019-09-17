@@ -18,13 +18,13 @@ open class RELCellSelector {
     public typealias BindDataBlock = (_ object:Any?, _ cell: AnyObject, _ userInfo:[AnyHashable:Any]?)->Void
 
     public typealias TableViewCellBlock = (_ identifier: String?, _ userInfo:[AnyHashable:Any]?)->UITableViewCell
-    #if CanUseASDK
+    #if (CanUseASDK || canImport(AsyncDisplayKit))
     public typealias NodeCellBlock = (_ userInfo:[AnyHashable:Any]?)->ASCellNode
     #endif
 
     public typealias TableViewCellBindDataBlock = (_ object:Any?, _ cell: UITableViewCell, _ userInfo:[AnyHashable:Any]?)->Void
     public typealias CollectionViewCellBindDataBlock = (_ object:Any?, _ cell: UICollectionViewCell, _ userInfo:[AnyHashable:Any]?)->Void
-    #if CanUseASDK
+    #if (CanUseASDK || canImport(AsyncDisplayKit))
     public typealias NodeCellBindDataBlock = (_ object:Any?, _ cell: ASCellNode, _ userInfo:[AnyHashable:Any]?)->Void
     #endif
 
@@ -39,7 +39,8 @@ open class RELCellSelector {
 //    var collectionViewCellBindDataBlock:CollectionViewCellBindDataBlock?
 //    var nodeCellBindDataBlock:NodeCellBindDataBlock?
 
-    var collectionViewCellClass:UICollectionViewCell.Type?
+    var collectionViewRegisterObject:Any?
+    var supplementaryViewOfKind:String?
 
     ///if this is nil, we do not deque cells from tableView but init each time, so better set a identifier
     ///required for collectionView
@@ -59,10 +60,10 @@ open class RELCellSelector {
     public convenience init(matchBlock:@escaping MatchBlock, identifier:String, collectionViewCellClass:UICollectionViewCell.Type) {
         self.init(matchBlock: matchBlock)
         self.identifier = identifier
-        self.collectionViewCellClass = collectionViewCellClass
+        self.collectionViewRegisterObject = collectionViewCellClass
     }
 
-    #if CanUseASDK
+    #if (CanUseASDK || canImport(AsyncDisplayKit))
     public convenience init(matchBlock:@escaping MatchBlock, cellBlock:@escaping NodeCellBlock) {
         self.init(matchBlock: matchBlock)
         self.setCellBlock(cellBlock)
@@ -92,7 +93,7 @@ open class RELCellSelector {
         return self
     }
 
-    #if CanUseASDK
+    #if (CanUseASDK || canImport(AsyncDisplayKit))
     @discardableResult
     open func setCellBlock(_ block:@escaping NodeCellBlock) -> RELCellSelector {
         self.cellBlock = {(_, userInfo) in
@@ -130,7 +131,7 @@ open class RELCellSelector {
         return self
     }
 
-    #if CanUseASDK
+    #if (CanUseASDK || canImport(AsyncDisplayKit))
     @discardableResult
     open func setBindDataBlock(_ block:@escaping NodeCellBindDataBlock)->RELCellSelector {
         self.bindDataBlock = {(object, cellObject, userInfo) in
@@ -175,7 +176,7 @@ open class RELCellSelector {
         return nil
     }
 
-    #if CanUseASDK
+    #if (CanUseASDK || canImport(AsyncDisplayKit))
     open func makeCell(userInfo:[AnyHashable:Any]?)->ASCellNode? {
         if let cellObject = self._makeCell(identifier: identifier, userInfo: userInfo) {
             if let cell = cellObject as? ASCellNode {

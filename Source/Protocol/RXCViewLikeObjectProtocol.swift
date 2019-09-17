@@ -7,7 +7,7 @@
 //
 
 import UIKit
-#if CanUseASDK && canImport(AsyncDisplayKit)
+#if (CanUseASDK || canImport(AsyncDisplayKit)) && canImport(AsyncDisplayKit)
 import AsyncDisplayKit
 #endif
 
@@ -21,7 +21,7 @@ protocol RXCViewLikeObjectProtocol: AnyObject {
     func likeViewToView()->UIView
 }
 
-#if CanUseASDK
+#if (CanUseASDK || canImport(AsyncDisplayKit))
 extension ASDisplayNode: RXCViewLikeObjectProtocol {
 
     func likeViewToView() -> UIView {

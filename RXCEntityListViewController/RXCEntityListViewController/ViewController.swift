@@ -7,12 +7,15 @@
 //
 
 import UIKit
+import RXCDiffArray
+import AsyncDisplayKit
 
-class ViewController: UIViewController {
+class ViewController: RELFirstTimeViewController {
+
 
     override func viewDidLoad() {
         super.viewDidLoad()
-       // let a = RXCEntityListViewController<AnyObject>()
+
     }
 
 

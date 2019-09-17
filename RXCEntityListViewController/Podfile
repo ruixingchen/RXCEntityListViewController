@@ -6,5 +6,9 @@ target 'RXCEntityListViewController' do
   use_frameworks!
 
     pod 'Texture', '~> 2.8'
+    pod 'RXCDiffArray', :path => "/Users/ruixingchen/Developer/Mine/RXCDiffArray"
+    pod 'RXCDiffArray/ASDKExtension', :path => "/Users/ruixingchen/Developer/Mine/RXCDiffArray"
+    pod 'RXCDiffArray/DifferenceKit', :path => "/Users/ruixingchen/Developer/Mine/RXCDiffArray"
+#    pod 'RXCDiffArray', :git => "https://github.com/ruixingchen/RXCDiffArray.git"
 
 end

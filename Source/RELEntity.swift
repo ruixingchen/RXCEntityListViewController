@@ -7,8 +7,9 @@
 //
 
 import Foundation
+import RXCDiffArray
 
-public protocol RELEntity {
+public protocol RELEntity: Differentiable {
 
     
 

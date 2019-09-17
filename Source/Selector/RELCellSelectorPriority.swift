@@ -25,7 +25,7 @@ public struct RELCellSelectorPriority : ExpressibleByIntegerLiteral, Equatable {
     }
 
     public static var max: RELCellSelectorPriority {
-        return 1000
+        return RELCellSelectorPriority(IntegerLiteralType.max)
     }
 
     public static var high: RELCellSelectorPriority {
@@ -38,6 +38,10 @@ public struct RELCellSelectorPriority : ExpressibleByIntegerLiteral, Equatable {
 
     public static var low: RELCellSelectorPriority {
         return 250
+    }
+
+    public static var lowest: RELCellSelectorPriority {
+        return RELCellSelectorPriority(IntegerLiteralType.min)
     }
 
     public static func ==(lhs: RELCellSelectorPriority, rhs: RELCellSelectorPriority) -> Bool {
