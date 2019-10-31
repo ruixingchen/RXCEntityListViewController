@@ -1,0 +1,56 @@
+{
+  "name": "RXCEntityListViewController",
+  "version": "1.0",
+  "authors": {
+    "ruixingchen": "rxc@ruixingchen.com"
+  },
+  "summary": "1",
+  "description": "1",
+  "homepage": "https://github.com/ruixingchen/RXCEntityListViewController",
+  "license": "MIT",
+  "source": {
+    "git": "https://github.com/ruixingchen/RXCEntityListViewController.git",
+    "tag": "1.0"
+  },
+  "requires_arc": true,
+  "swift_versions": "5.0",
+  "platforms": {
+    "ios": "9.0"
+  },
+  "default_subspecs": "Core",
+  "subspecs": [
+    {
+      "name": "Core",
+      "dependencies": {
+        "RXCDiffArray": [
+          "~> 1.1"
+        ],
+        "RXCDiffArray/DifferenceKit": [
+
+        ]
+      },
+      "ios": {
+        "source_files": "Source/**/*.swift",
+        "frameworks": [
+          "Foundation",
+          "UIKit"
+        ]
+      }
+    },
+    {
+      "name": "Texture",
+      "dependencies": {
+        "Texture": [
+          "~> 2.8"
+        ],
+        "RXCDiffArray/ASDKExtension": [
+          "~> 1.1"
+        ],
+        "RXCEntityListViewController/Core": [
+
+        ]
+      }
+    }
+  ],
+  "swift_version": "5.0"
+}

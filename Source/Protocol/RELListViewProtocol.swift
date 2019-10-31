@@ -24,7 +24,7 @@ fileprivate extension UICollectionView.ScrollPosition {
 }
 
 ///将所有列表视图的API进行统一
-public protocol RELListViewProtocol: AnyObject {
+public protocol RELListViewProtocol: RXCScrollViewLikeObjectProtocol {
 
     var rel_numberOfSections: Int { get }
 
@@ -561,8 +561,6 @@ extension ASCollectionNode: RELListViewProtocol {
 
 #endif
 
-#if canImport(RXCDiffArray)
-
 public extension RELListViewProtocol {
 
     /// 将diff映射到UI上
@@ -662,5 +660,3 @@ public extension RELListViewProtocol {
     }
 
 }
-
-#endif

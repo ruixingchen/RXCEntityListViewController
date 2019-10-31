@@ -1,0 +1,6 @@
+framework module RXCEntityListViewController {
+  umbrella header "RXCEntityListViewController-umbrella.h"
+
+  export *
+  module * { export * }
+}
