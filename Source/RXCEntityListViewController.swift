@@ -22,6 +22,9 @@ import Alamofire
 #if canImport(MJRefresh)
 import MJRefresh
 #endif
+#if canImport(RXCSwiftComponents)
+import RXCSwiftComponents
+#endif
 
 #if !(CanUseASDK || canImport(AsyncDisplayKit))
 private protocol ASTableDataSource {
@@ -80,16 +83,22 @@ public extension RXCEntityListViewController {
 
 open class RXCEntityListViewController: RELFirstTimeViewController, ASTableDataSource, ASTableDelegate, ASCollectionDataSource, ASCollectionDelegate, UITableViewDataSource, UITableViewDelegate, UICollectionViewDataSource, UICollectionViewDelegate, RXCDiffArrayDelegate {
 
-    public typealias SectionELement = Card
-    public typealias RowElement = Entity
-    public typealias DataList = RXCDiffArray<ContiguousArray<SectionELement>, RowElement>
+    public typealias SectionELement = RELCardProtocol
+    public typealias RowElement = RELEntityProtocol
+    public typealias DataList = RXCDiffArray<[SectionELement]>
     //下面的别名是为了方便我们整合代码, 当需要修改的时候直接改这里就好, 降低复杂度, 为了通用性考虑, 默认直接采用AnyObject也是极好的
-    public typealias ListRequestSpec = EntityListRequestSpecV2
+    public typealias ListRequestSpec = AnyObject
     public typealias ListRequestTask = AnyObject
-    public typealias ListRequestResponse = ApiRequestResultV2<[Entity]>
+    public typealias ListRequestResponse = AnyObject
 
+    internal var _listViewObject:RXCListViewProtocol?
     ///本地存储列表视图的指针
-    open var listViewObject: RELListViewProtocol!
+    open var listViewObject: RXCListViewProtocol {
+        if self._listViewObject == nil {
+            self._listViewObject = self.initListView()
+        }
+        return self._listViewObject!
+    }
 
     #if (CanUseASDK || canImport(AsyncDisplayKit))
 
@@ -136,21 +145,13 @@ open class RXCEntityListViewController: RELFirstTimeViewController, ASTableDataS
 
     //MARK: - 数据 / Data
 
-    /**
-     试验性的采用双数据源, 一份本地优化过的数据源, 一份来自服务器的数据源
-     有时候服务器传来的数据是经过多层嵌套的, 比如一个Card里面含有很多个Feed, b如果将这些Feed都放在一个Cell中显示, 显然不合适
-     我们可以将服务器传来的Card数据进行拆分, 将Card拆分成许多兄弟Entity, 再添加描述分割线高度的占位Entity, 组成一个一维列表
-     逻辑如下:
-     原始数据:  Card(Entity, Entity, Entity...)
-     转换成:   Entity,分割线, Entity, 分割线 Entity...
-     这样我们就可以自由的控制分割线的高度和任何样式
-     当请求的时候, 我们直接从原始数据源中读取数据就可以了
-     缺点就是请求的时候需要对两个数据源都要进行更新
-     */
-    open var localDataList: DataList!
-
-    ///从服务器获取的数据源, 具体逻辑参考localDataList的注释
-    open var originDataList:[[RowElement]] = []
+    internal var _localDataList:DataList?
+    open var localDataList: DataList {
+        if self._localDataList == nil {
+            self._localDataList = self.initDataList()
+        }
+        return self.localDataList
+    }
 
     ///当请求到数据后, 按照顺序让数据处理器对新请求到的数据进行处理或者过滤
     open var dataProcessors: [RELListRequestDataProcessorProtocol] = []
@@ -207,7 +208,7 @@ open class RXCEntityListViewController: RELFirstTimeViewController, ASTableDataS
         //这里的初始化顺序不要改
         self.initCellSelectorManager()
         self.initListView()
-        self.initDataList()
+        let _ = self.localDataList
         self.initDataProcessors()
     }
     #else
@@ -231,16 +232,15 @@ open class RXCEntityListViewController: RELFirstTimeViewController, ASTableDataS
     }
 
     ///初始化数据源
-    open func initDataList() {
+    open func initDataList()->DataList {
         //默认没有数据
-        //初始化的时候有数据, 则必须先调用一次reloadData(), 否则可能导致UI和数据源不同步
-        //如果是UICollectionView, 需要执行注册函数
-        self.localDataList = DataList()
-        self.localDataList.delegate = self
-        self.listViewObject.rel_reloadData()
+        let dataList = DataList()
+        dataList.addDelegate(self)
+        return dataList
     }
 
-    open func initListView() {
+    ///初始化列表视图, 返回初始化好的ListView
+    open func initListView()->RXCListViewProtocol {
         #if (CanUseASDK || canImport(AsyncDisplayKit))
         if self.useASDK {
             if self.useCollectionView {
@@ -249,14 +249,13 @@ open class RXCEntityListViewController: RELFirstTimeViewController, ASTableDataS
                 let cn = ASCollectionNode(collectionViewLayout: flow)
                 cn.dataSource = self
                 cn.delegate = self
-                self.listViewObject = cn
+                return cn
             } else {
                 let tn = ASTableNode()
                 tn.dataSource = self
                 tn.delegate = self
-                self.listViewObject = tn
+                return tn
             }
-            return
         }
         #endif
         if self.useCollectionView {
@@ -265,20 +264,18 @@ open class RXCEntityListViewController: RELFirstTimeViewController, ASTableDataS
             let cv = UICollectionView(frame: UIScreen.main.bounds, collectionViewLayout: flow)
             cv.dataSource = self
             cv.delegate = self
-            self.listViewObject = cv
-            //如果是UICollectionView, 我们需要注册Cell
-            self.registerCellForUICollectionView()
+            return cv
         } else {
             let tv = UITableView()
             tv.dataSource = self
             tv.delegate = self
-            self.listViewObject = tv
+            return tv
         }
     }
 
-    ///如果是UICollectionView, 需要在显示之前执行注册Cell的操作, 默认是让CellSelectorManager自己去处理
-    open func registerCellForUICollectionView() {
-        if let view = self.collectionView {
+    ///如果要使用TableView的注册模式或者CollectionView, 需要在这里执行注册方法
+    open func registerCellOrNibForListView() {
+        if let view = self.listViewObject as? UICollectionView {
             self.cellSelectorManager.collectionViewRegister(collectionView: view)
         }
     }

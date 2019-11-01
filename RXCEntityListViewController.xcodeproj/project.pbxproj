@@ -14,9 +14,6 @@
 		80C8D4DE236B2A3000664FC5 /* RELCellSelectorPriority.swift in Sources */ = {isa = PBXBuildFile; fileRef = 80C8D4C4236B2A3000664FC5 /* RELCellSelectorPriority.swift */; };
 		80C8D4E0236B2A3000664FC5 /* RELCard.swift in Sources */ = {isa = PBXBuildFile; fileRef = 80C8D4C6236B2A3000664FC5 /* RELCard.swift */; };
 		80C8D4EB236B2A3000664FC5 /* EntityListRequestSpecV2.swift in Sources */ = {isa = PBXBuildFile; fileRef = 80C8D4D2236B2A3000664FC5 /* EntityListRequestSpecV2.swift */; };
-		80C8D4EC236B2A3000664FC5 /* RELListViewProtocol.swift in Sources */ = {isa = PBXBuildFile; fileRef = 80C8D4D4236B2A3000664FC5 /* RELListViewProtocol.swift */; };
-		80C8D4ED236B2A3000664FC5 /* RXCScrollViewLikeObjectProtocol.swift in Sources */ = {isa = PBXBuildFile; fileRef = 80C8D4D5236B2A3000664FC5 /* RXCScrollViewLikeObjectProtocol.swift */; };
-		80C8D4EE236B2A3000664FC5 /* RXCViewLikeObjectProtocol.swift in Sources */ = {isa = PBXBuildFile; fileRef = 80C8D4D6236B2A3000664FC5 /* RXCViewLikeObjectProtocol.swift */; };
 		80C8D4EF236B2A3000664FC5 /* RELListRequestDataProcessorProtocol.swift in Sources */ = {isa = PBXBuildFile; fileRef = 80C8D4D7236B2A3000664FC5 /* RELListRequestDataProcessorProtocol.swift */; };
 		80C8D4F0236B2A3000664FC5 /* RELDataBindableObjectProtocol.swift in Sources */ = {isa = PBXBuildFile; fileRef = 80C8D4D8236B2A3000664FC5 /* RELDataBindableObjectProtocol.swift */; };
 		80C8D4F1236B2A3000664FC5 /* RELEntity.swift in Sources */ = {isa = PBXBuildFile; fileRef = 80C8D4D9236B2A3000664FC5 /* RELEntity.swift */; };
@@ -58,9 +55,6 @@
 		80C8D4CF236B2A3000664FC5 /* RXCGenericRemoteEntityParserV2.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = RXCGenericRemoteEntityParserV2.swift; sourceTree = "<group>"; };
 		80C8D4D0236B2A3000664FC5 /* ApiRequestSpecV2.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = ApiRequestSpecV2.swift; sourceTree = "<group>"; };
 		80C8D4D2236B2A3000664FC5 /* EntityListRequestSpecV2.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = EntityListRequestSpecV2.swift; sourceTree = "<group>"; };
-		80C8D4D4236B2A3000664FC5 /* RELListViewProtocol.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = RELListViewProtocol.swift; sourceTree = "<group>"; };
-		80C8D4D5236B2A3000664FC5 /* RXCScrollViewLikeObjectProtocol.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = RXCScrollViewLikeObjectProtocol.swift; sourceTree = "<group>"; };
-		80C8D4D6236B2A3000664FC5 /* RXCViewLikeObjectProtocol.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = RXCViewLikeObjectProtocol.swift; sourceTree = "<group>"; };
 		80C8D4D7236B2A3000664FC5 /* RELListRequestDataProcessorProtocol.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = RELListRequestDataProcessorProtocol.swift; sourceTree = "<group>"; };
 		80C8D4D8236B2A3000664FC5 /* RELDataBindableObjectProtocol.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = RELDataBindableObjectProtocol.swift; sourceTree = "<group>"; };
 		80C8D4D9236B2A3000664FC5 /* RELEntity.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = RELEntity.swift; sourceTree = "<group>"; };
@@ -142,6 +136,7 @@
 		80C8D4C1236B2A3000664FC5 /* Source */ = {
 			isa = PBXGroup;
 			children = (
+				80CCEB7C236C3B7F000FCD6F /* Extension */,
 				80C8D4F5236B2A3600664FC5 /* Model */,
 				80C8D4C8236B2A3000664FC5 /* APIRequestSystem */,
 				80C8D4C2236B2A3000664FC5 /* CellSelectorManager */,
@@ -183,9 +178,6 @@
 		80C8D4D3236B2A3000664FC5 /* Protocol */ = {
 			isa = PBXGroup;
 			children = (
-				80C8D4D4236B2A3000664FC5 /* RELListViewProtocol.swift */,
-				80C8D4D5236B2A3000664FC5 /* RXCScrollViewLikeObjectProtocol.swift */,
-				80C8D4D6236B2A3000664FC5 /* RXCViewLikeObjectProtocol.swift */,
 				80C8D4D7236B2A3000664FC5 /* RELListRequestDataProcessorProtocol.swift */,
 				80C8D4D8236B2A3000664FC5 /* RELDataBindableObjectProtocol.swift */,
 			);
@@ -199,6 +191,29 @@
 				80C8D4C6236B2A3000664FC5 /* RELCard.swift */,
 			);
 			path = Model;
+			sourceTree = "<group>";
+		};
+		80CCEB7C236C3B7F000FCD6F /* Extension */ = {
+			isa = PBXGroup;
+			children = (
+				80CCEB7E236C3BB2000FCD6F /* UIKit */,
+				80CCEB7D236C3BA8000FCD6F /* ASDK */,
+			);
+			path = Extension;
+			sourceTree = "<group>";
+		};
+		80CCEB7D236C3BA8000FCD6F /* ASDK */ = {
+			isa = PBXGroup;
+			children = (
+			);
+			path = ASDK;
+			sourceTree = "<group>";
+		};
+		80CCEB7E236C3BB2000FCD6F /* UIKit */ = {
+			isa = PBXGroup;
+			children = (
+			);
+			path = UIKit;
 			sourceTree = "<group>";
 		};
 		BFC4F2EE1211E4A302A34894 /* Pods */ = {
@@ -349,15 +364,12 @@
 				80C8D4F4236B2A3000664FC5 /* RXCEntityListViewController.swift in Sources */,
 				80C8D4F3236B2A3000664FC5 /* RELFirstTimeViewController.swift in Sources */,
 				80C8D4E0236B2A3000664FC5 /* RELCard.swift in Sources */,
-				80C8D4ED236B2A3000664FC5 /* RXCScrollViewLikeObjectProtocol.swift in Sources */,
 				80C8D4EB236B2A3000664FC5 /* EntityListRequestSpecV2.swift in Sources */,
 				80C8D4DD236B2A3000664FC5 /* RELCellSelectorManager.swift in Sources */,
 				80C8D4EF236B2A3000664FC5 /* RELListRequestDataProcessorProtocol.swift in Sources */,
-				80C8D4EC236B2A3000664FC5 /* RELListViewProtocol.swift in Sources */,
 				80C8D4F0236B2A3000664FC5 /* RELDataBindableObjectProtocol.swift in Sources */,
 				80C8D4F2236B2A3000664FC5 /* RXCMessagedError.swift in Sources */,
 				80C8D4F1236B2A3000664FC5 /* RELEntity.swift in Sources */,
-				80C8D4EE236B2A3000664FC5 /* RXCViewLikeObjectProtocol.swift in Sources */,
 				80C8D4F7236B2B4400664FC5 /* RELCellSelector.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
@@ -513,6 +525,7 @@
 				DYLIB_INSTALL_NAME_BASE = "@rpath";
 				INFOPLIST_FILE = RXCEntityListViewController/Info.plist;
 				INSTALL_PATH = "$(LOCAL_LIBRARY_DIR)/Frameworks";
+				IPHONEOS_DEPLOYMENT_TARGET = 10.0;
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",
 					"@executable_path/Frameworks",
@@ -538,6 +551,7 @@
 				DYLIB_INSTALL_NAME_BASE = "@rpath";
 				INFOPLIST_FILE = RXCEntityListViewController/Info.plist;
 				INSTALL_PATH = "$(LOCAL_LIBRARY_DIR)/Frameworks";
+				IPHONEOS_DEPLOYMENT_TARGET = 10.0;
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",
 					"@executable_path/Frameworks",

@@ -8,6 +8,7 @@
 
 import Foundation
 
+
 public protocol RELDataBindableObjectProtocol {
 
     func bindData(object:Any?, userInfo:[AnyHashable:Any]?)

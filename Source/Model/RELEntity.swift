@@ -9,7 +9,7 @@
 import Foundation
 
 ///表示一个
-public protocol RELEntity {
+public protocol RELEntityProtocol {
 
     
 

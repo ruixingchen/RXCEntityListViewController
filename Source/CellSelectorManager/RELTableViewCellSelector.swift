@@ -11,7 +11,6 @@ import UIKit
 import AsyncDisplayKit
 #endif
 
-
 open class RELCellSelector {
 
     public typealias MatchBlock = (_ object: Any?) -> Bool
@@ -32,13 +31,6 @@ open class RELCellSelector {
     var matchBlock:MatchBlock
     var cellBlock:CellBlock?
     var bindDataBlock:BindDataBlock?
-
-//    var tableViewCellBlock:TableViewCellBlock?
-//    var nodeCellBlock:NodeCellBlock?
-//
-//    var tableViewCellBindDataBlock:TableViewCellBindDataBlock?
-//    var collectionViewCellBindDataBlock:CollectionViewCellBindDataBlock?
-//    var nodeCellBindDataBlock:NodeCellBindDataBlock?
 
     var collectionViewRegisterObject:Any?
     var supplementaryViewOfKind:String?

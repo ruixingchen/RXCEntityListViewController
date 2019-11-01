@@ -15,7 +15,6 @@ import AsyncDisplayKit
 public class RELCellSelectorManager {
 
     public typealias Priority = RELCellSelectorPriority
-    public typealias PriorityValueType = RELCellSelectorPriority.PriorityValueType
 
     public class PrioritySelectorPair {
         public var priority: Priority
@@ -26,31 +25,33 @@ public class RELCellSelectorManager {
         }
     }
 
+    internal let queue:DispatchQueue = DispatchQueue.init(label: "queue", qos: .default, attributes: .concurrent)
+
     ///higher priority to lower priority
     public var prioritySelectorPairs:[PrioritySelectorPair] = []
 
-    fileprivate func lock() {
-        objc_sync_enter(self.prioritySelectorPairs)
-    }
-
-    fileprivate func unlock() {
-        objc_sync_exit(self.prioritySelectorPairs)
-    }
-
-    public func selectors(for priority:PriorityValueType)->[RELCellSelector]? {
-        return self.prioritySelectorPairs.filter({$0.priority.value==priority}).first?.selectors
-    }
-
-    public func setSelectors(for priority:PriorityValueType, selectors:[RELCellSelector]) {
-        self.lock()
-        let p = PrioritySelectorPair(priority: Priority(integerLiteral: priority))
-        p.selectors = selectors
-        if let index = self.prioritySelectorPairs.firstIndex(where: {$0.priority.value <= priority}) {
-            self.prioritySelectorPairs.insert(p, at: index)
-        }else {
-            self.prioritySelectorPairs.append(p)
+    internal func syncWrite(closure:()->Void) {
+        self.queue.async(group: nil, qos: .default, flags: .barrier) {
+            closure()
         }
-        self.unlock()
+    }
+
+    ///返回某个优先级的全部选择器
+    internal func selectors(for priority:Priority)->[RELCellSelector]? {
+        return self.prioritySelectorPairs.filter({$0.priority==priority}).first?.selectors
+    }
+
+    ///为某个优先级设置选择器
+    internal func setSelectors(for priority:Priority, selectors:[RELCellSelector]) {
+        let p = PrioritySelectorPair(priority: priority)
+        p.selectors = selectors
+        self.syncWrite {
+            if let index = self.prioritySelectorPairs.firstIndex(where: {$0.priority.value <= priority}) {
+                self.prioritySelectorPairs.insert(p, at: index)
+            }else {
+                self.prioritySelectorPairs.append(p)
+            }
+        }
     }
 
     //MARK: - Register
@@ -58,9 +59,11 @@ public class RELCellSelectorManager {
     /// the most common register, register a selector directly
     ///
     /// - Parameters:
-    ///   - append: true: append on the last, false: insert at the first
+    ///   - insert: false: append on the last, true: insert at the first
     public func register(_ selector: RELCellSelector, priority: Priority = .medium, insert:Bool=false) {
-        var selectors = self.selectors(for: priority.value) ?? []
+        self.lock()
+        defer {self.unlock()}
+        var selectors = self.selectors(for: priority) ?? []
         if insert {
             selectors.insert(selector, at: 0)
         }else{
@@ -70,7 +73,7 @@ public class RELCellSelectorManager {
     }
 
     ///register a defualt selector, we store only one default selector
-    public func registerDefault(identifier:String, _ cellBlock: @escaping RELCellSelector.TableViewCellBlock){
+    public func registerDefault(identifier:String, _ cellBlock: @escaping RELCellSelector){
         let selector = RELCellSelector(matchBlock: {_ in return true}, identifier: identifier, cellBlock: cellBlock)
         self.setSelectors(for: PriorityValueType.min, selectors: [selector])
     }

@@ -9,7 +9,7 @@
 import Foundation
 import RXCDiffArray
 
-public protocol RELCardProtocol: RELEntity {
+public protocol RELCardProtocol: RELEntityProtocol {
 
     ///不采用范型, 这里直接采用Any, 后面自己做cast
     var rel_cardObjects:[Any]? {get set}

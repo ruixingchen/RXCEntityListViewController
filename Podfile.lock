@@ -5,6 +5,7 @@ PODS:
   - DifferenceKit/Core (1.1.3)
   - DifferenceKit/UIKitExtension (1.1.3):
     - DifferenceKit/Core
+  - MJRefresh (3.2.0)
   - PINCache (3.0.1-beta.6):
     - PINCache/Arc-exception-safe (= 3.0.1-beta.6)
     - PINCache/Core (= 3.0.1-beta.6)
@@ -32,6 +33,13 @@ PODS:
     - RXCDiffArray/Core
   - RXCDiffArray/UIKitExtension (1.1):
     - RXCDiffArray/Core
+  - RXCSwiftComponents (1.0):
+    - RXCSwiftComponents/Core (= 1.0)
+  - RXCSwiftComponents/Core (1.0)
+  - RXCSwiftComponents/MJRefresh (1.0):
+    - MJRefresh (~> 3.2)
+  - RXCSwiftComponents/Texture (1.0):
+    - Texture (~> 2.8)
   - Texture (2.8.1):
     - Texture/AssetsLibrary (= 2.8.1)
     - Texture/Core (= 2.8.1)
@@ -57,25 +65,35 @@ DEPENDENCIES:
   - RXCDiffArray (~> 1.1)
   - RXCDiffArray/ASDKExtension
   - RXCDiffArray/DifferenceKit
+  - RXCSwiftComponents (from `../RXCSwiftComponents`)
+  - RXCSwiftComponents/MJRefresh (from `../RXCSwiftComponents`)
+  - RXCSwiftComponents/Texture (from `../RXCSwiftComponents`)
   - Texture
 
 SPEC REPOS:
   trunk:
     - DifferenceKit
+    - MJRefresh
     - PINCache
     - PINOperation
     - PINRemoteImage
     - RXCDiffArray
     - Texture
 
+EXTERNAL SOURCES:
+  RXCSwiftComponents:
+    :path: "../RXCSwiftComponents"
+
 SPEC CHECKSUMS:
   DifferenceKit: 5018791b6c1fc839921a3c171a0a539ace6ea60c
+  MJRefresh: ed450d6eb9d3346a2cb033ab7eb6de090aeef437
   PINCache: d195fdba255283f7e9900a55e3cced377f431f9b
   PINOperation: 24b774353ca248fcf87d67b2d61eef42087c125a
   PINRemoteImage: d6d51c5d2adda55f1ce30c96e850b6c4ebd2856a
   RXCDiffArray: 22ab8acb400b7dedb6208ce2a034892b81494940
+  RXCSwiftComponents: ec723ac5b16ea45a55999f569c1128629f305b3e
   Texture: 8ecf6984065a1e54f06bf97b349ecca28582acd7
 
-PODFILE CHECKSUM: 746ae9cb4c39c96eae485d7dae2abdbd7e9453a2
+PODFILE CHECKSUM: 02007efc9101fb8bc6cee3296d237a05330e05a5
 
 COCOAPODS: 1.8.4

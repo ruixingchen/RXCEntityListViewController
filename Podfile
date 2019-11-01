@@ -9,5 +9,9 @@ target 'RXCEntityListViewController' do
   pod 'RXCDiffArray/DifferenceKit'
   pod 'RXCDiffArray/ASDKExtension'
   pod 'Texture'
+  pod 'RXCSwiftComponents', :path=> '../RXCSwiftComponents'
+  pod 'RXCSwiftComponents/Texture', :path=> '../RXCSwiftComponents'
+  pod 'RXCSwiftComponents/MJRefresh', :path=> '../RXCSwiftComponents'
+
 
 end

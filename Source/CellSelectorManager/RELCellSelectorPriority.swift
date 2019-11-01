@@ -8,20 +8,26 @@
 
 import Foundation
 
-public struct RELCellSelectorPriority : ExpressibleByIntegerLiteral, Equatable {
-
-    public typealias PriorityValueType = UInt16
-    public typealias IntegerLiteralType = UInt16
-    public typealias Stride = UInt16
-
-    public let value: PriorityValueType
-
-    public init(integerLiteral value: IntegerLiteralType) {
-        self.value = value
+public struct RELCellSelectorPriority: ExpressibleByIntegerLiteral, Equatable, Comparable {
+    
+    public static func < (lhs: RELCellSelectorPriority, rhs: RELCellSelectorPriority) -> Bool {
+        return lhs.value < rhs.value
     }
 
-    public init(_ value: PriorityValueType) {
-        self.value = value
+    public static func <= (lhs: RELCellSelectorPriority, rhs: RELCellSelectorPriority) -> Bool {
+        return lhs.value <= rhs.value
+    }
+
+    public static func > (lhs: RELCellSelectorPriority, rhs: RELCellSelectorPriority) -> Bool {
+        return lhs.value > rhs.value
+    }
+
+    public static func >= (lhs: RELCellSelectorPriority, rhs: RELCellSelectorPriority) -> Bool {
+        return lhs.value >= rhs.value
+    }
+
+    public static func == (lhs: RELCellSelectorPriority, rhs: RELCellSelectorPriority) -> Bool {
+        return lhs.value == rhs.value
     }
 
     public static var max: RELCellSelectorPriority {
@@ -44,8 +50,17 @@ public struct RELCellSelectorPriority : ExpressibleByIntegerLiteral, Equatable {
         return RELCellSelectorPriority(IntegerLiteralType.min)
     }
 
-    public static func ==(lhs: RELCellSelectorPriority, rhs: RELCellSelectorPriority) -> Bool {
-        return lhs.value == rhs.value
+    public typealias ValueType = UInt16
+    public typealias IntegerLiteralType = UInt16
+
+    public let value: ValueType
+
+    public init(integerLiteral value: Self.IntegerLiteralType) {
+        self.value = value
+    }
+
+    public init(_ value: ValueType) {
+        self.value = value
     }
 
 }
