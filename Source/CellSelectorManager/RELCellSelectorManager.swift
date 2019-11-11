@@ -25,15 +25,23 @@ public class RELCellSelectorManager {
         }
     }
 
-    internal let queue:DispatchQueue = DispatchQueue.init(label: "queue", qos: .default, attributes: .concurrent)
+    internal let readWriteQueue:DispatchQueue = DispatchQueue.init(label: "readWriteQueue", qos: .default, attributes: .concurrent)
 
     ///higher priority to lower priority
     public var prioritySelectorPairs:[PrioritySelectorPair] = []
 
-    internal func syncWrite(closure:()->Void) {
-        self.queue.async(group: nil, qos: .default, flags: .barrier) {
+    internal func safeRead(closure:@escaping()->Void) {
+        self.readWriteQueue.sync {
             closure()
         }
+    }
+
+    internal func safeWrite(closure:@escaping()->Void) {
+        let g = DispatchGroup()
+        self.readWriteQueue.async(group: g, qos: .default, flags: .barrier) {
+            closure()
+        }
+        g.wait()
     }
 
     ///返回某个优先级的全部选择器
@@ -43,61 +51,56 @@ public class RELCellSelectorManager {
 
     ///为某个优先级设置选择器
     internal func setSelectors(for priority:Priority, selectors:[RELCellSelector]) {
-        let p = PrioritySelectorPair(priority: priority)
-        p.selectors = selectors
-        self.syncWrite {
-            if let index = self.prioritySelectorPairs.firstIndex(where: {$0.priority.value <= priority}) {
-                self.prioritySelectorPairs.insert(p, at: index)
-            }else {
-                self.prioritySelectorPairs.append(p)
-            }
+        let pair = PrioritySelectorPair(priority: priority)
+        pair.selectors = selectors
+        if let index = self.prioritySelectorPairs.firstIndex(where: {$0.priority == priority}) {
+            //alread exist
+            self.prioritySelectorPairs[index] = pair
+        }else if let index = self.prioritySelectorPairs.firstIndex(where: {$0.priority < priority}) {
+            //insert a new
+            self.prioritySelectorPairs.insert(pair, at: index)
+        }else {
+            //insert at the end
+            self.prioritySelectorPairs.append(pair)
         }
     }
 
-    //MARK: - Register
+}
+
+//MARK: - Register
+extension RELCellSelectorManager {
 
     /// the most common register, register a selector directly
     ///
     /// - Parameters:
     ///   - insert: false: append on the last, true: insert at the first
     public func register(_ selector: RELCellSelector, priority: Priority = .medium, insert:Bool=false) {
-        self.lock()
-        defer {self.unlock()}
-        var selectors = self.selectors(for: priority) ?? []
-        if insert {
-            selectors.insert(selector, at: 0)
-        }else{
-            selectors.append(selector)
+        self.safeWrite {
+            var selectors = self.selectors(for: priority) ?? []
+            if insert {
+                selectors.insert(selector, at: 0)
+            }else{
+                selectors.append(selector)
+            }
+            self.setSelectors(for: priority, selectors: selectors)
         }
-        self.setSelectors(for: priority.value, selectors: selectors)
     }
 
     ///register a defualt selector, we store only one default selector
-    public func registerDefault(identifier:String, _ cellBlock: @escaping RELCellSelector){
-        let selector = RELCellSelector(matchBlock: {_ in return true}, identifier: identifier, cellBlock: cellBlock)
-        self.setSelectors(for: PriorityValueType.min, selectors: [selector])
+    public func registerDefault(_ selector: RELCellSelector) {
+        self.safeWrite {
+            self.setSelectors(for: Priority.min, selectors: [selector])
+        }
     }
+}
 
-    public func registerDefault(identifier:String, cellClass: UICollectionViewCell.Type) {
-        let selector = RELCellSelector(matchBlock: {_ in return true}, identifier: identifier, collectionViewCellClass: cellClass)
-        self.setSelectors(for: PriorityValueType.min, selectors: [selector])
-    }
-
-    #if canImport(AsyncDisplayKit)
-    public func registerDefault(cellBlock: @escaping RELCellSelector.NodeCellBlock){
-        let selector = RELCellSelector(matchBlock: {_ in return true}, cellBlock: cellBlock)
-        self.setSelectors(for: PriorityValueType.min, selectors: [selector])
-    }
-    #endif
-
-    //MARK: - Retrive
-
+//MARK: - Retrive
+extension RELCellSelectorManager {
     ///retrive a selector, private function
     public func selector(for object:Any?, indexPath:IndexPath?=nil, includeDefault:Bool=true)->RELCellSelector? {
-
-        for i in self.prioritySelectorPairs {
-            if !includeDefault && i.priority.value == PriorityValueType.min {continue}
-            let selectors = i.selectors
+        for pair in self.prioritySelectorPairs {
+            if !includeDefault && pair.priority.value == Priority.ValueType.min {continue}
+            let selectors = pair.selectors
             for j in selectors {
                 if j.isMatched(object: object) {
                     return j
@@ -109,6 +112,7 @@ public class RELCellSelectorManager {
 
     ///公共的取回Cell的方法
     fileprivate func _retriveCell(for listView: AnyObject, object: Any?, indexPath: IndexPath?, includeDefault:Bool, userInfoForBindingData userInfo:[AnyHashable:Any]?) -> AnyObject? {
+
         guard let selector: RELCellSelector = self.selector(for: object, indexPath: indexPath,includeDefault: includeDefault) else {
             return nil
         }
@@ -120,41 +124,40 @@ public class RELCellSelectorManager {
         }
 
         var cell: AnyObject?
-        let identifier: String? = selector.identifier
+        let identifier: String? = selector.reuseIdentifier
 
         if let cv = listView as? UICollectionView {
             precondition(identifier != nil, "collectionView 模式下 identifier不可以为nil")
+            precondition(indexPath != nil, "collectionView 模式下 indexPath不可以为nil")
             cell = cv.dequeueReusableCell(withReuseIdentifier: identifier!, for: indexPath!)
         }else if let tv = listView as? UITableView {
             if let validIdentifier = identifier {
                 cell = tv.dequeueReusableCell(withIdentifier: validIdentifier)
             }
             if cell == nil {
-                cell = selector.makeCell(identifier: identifier, userInfo: nil)
+                cell = selector.makeTableViewCell(userInfo: outUserInfo)
             }
         }else {
             #if (CanUseASDK || canImport(AsyncDisplayKit))
             if let _ = listView as? ASTableNode {
-                cell = selector.makeCell(userInfo: nil)
+                cell = selector.makeCellNodeBlock(userInfo: outUserInfo)
             }else if let _ = listView as? ASCollectionNode {
-                cell = selector.makeCell(userInfo: nil)
+                cell = selector.makeCellNodeBlock(userInfo: outUserInfo)
             }
             #endif
         }
 
         guard let validCell = cell else {
             //WTF?
-            assertionFailure("SHOULD INIT THE CELL HERE!!!")
+            assertionFailure("CAN NOT FIND A MATCHED SELECTOR TO INIT CELL, CHECK YOUR CODES OR USE A DEFAULT SELECTOR")
             return nil
         }
 
         if let bindDataBlock = selector.bindDataBlock {
-            bindDataBlock(object, validCell, outUserInfo)
-        }else{
+            bindDataBlock(validCell, object, outUserInfo)
+        }else if let needBind = cell as? RELDataBindableObjectProtocol {
             //default data binding
-            if let needBind = cell as? RELDataBindableObjectProtocol {
-                needBind.bindData(object: object, userInfo: outUserInfo)
-            }
+            needBind.rxc_bindData(data: object, userInfo: outUserInfo)
         }
 
         return validCell
@@ -167,24 +170,21 @@ public class RELCellSelectorManager {
         if let cell = cellObject as? UITableViewCell {
             return cell
         }else {
-            assertionFailure("生成的Cell类型不合适")
-            print("生成的Cell类型不合适")
+            assertionFailure("wrong cell type")
+            return nil
         }
-        return nil
     }
 
     ///retrive a cell if possible
-    public func retriveCell(for listView:UICollectionView, object: Any?, indexPath: IndexPath?=nil, includeDefault:Bool=true, userInfoForBindData userInfo:[AnyHashable:Any]?=nil) -> UICollectionViewCell? {
+    public func retriveCell(for listView: UICollectionView, object: Any?, indexPath: IndexPath?=nil, includeDefault:Bool=true, userInfoForBindData userInfo:[AnyHashable:Any]?=nil) -> UICollectionViewCell? {
 
         let cellObject = self._retriveCell(for: listView, object: object, indexPath: indexPath, includeDefault: includeDefault, userInfoForBindingData: userInfo)
         if let cell = cellObject as? UICollectionViewCell {
             return cell
         }else {
-            assertionFailure("生成的Cell类型不合适")
-            print("生成的Cell类型不合适")
+            assertionFailure("wrong cell type")
+            return nil
         }
-        return nil
-
     }
 
     #if canImport(AsyncDisplayKit)
@@ -194,10 +194,9 @@ public class RELCellSelectorManager {
         if let cell = cellObject as? ASCellNode {
             return cell
         }else {
-            assertionFailure("生成的Cell类型不合适")
-            print("生成的Cell类型不合适")
+            assertionFailure("wrong cell type")
+            return nil
         }
-        return nil
     }
 
     public func retriveCell(for listView:ASCollectionNode, object: Any?, indexPath: IndexPath?=nil, includeDefault:Bool=true, userInfoForBindData userInfo:[AnyHashable:Any]?=nil) -> ASCellNode? {
@@ -205,60 +204,32 @@ public class RELCellSelectorManager {
         if let cell = cellObject as? ASCellNode {
             return cell
         }else {
-            assertionFailure("生成的Cell类型不合适")
-            print("生成的Cell类型不合适")
+            assertionFailure("wrong cell type")
+            return nil
         }
-        return nil
     }
 
     #endif
-
-}
-
-//MARK: - Convenience register
-public extension RELCellSelectorManager {
-
-    func register(identifier:String?, matchBlock:@escaping RELCellSelector.MatchBlock, cellBlock: @escaping RELCellSelector.TableViewCellBlock, priority: Priority = Priority.medium, insert:Bool=false) {
-        let selector = RELCellSelector(matchBlock: matchBlock, identifier: identifier, cellBlock: cellBlock)
-        self.register(selector, priority: priority, insert: insert)
-    }
-
-    func register(identifier:String, matchBlock:@escaping RELCellSelector.MatchBlock, cellClass:UICollectionViewCell.Type, priority: Priority = Priority.medium, insert:Bool=false) {
-
-        let selector = RELCellSelector(matchBlock: matchBlock, identifier: identifier, collectionViewCellClass: cellClass)
-        self.register(selector, priority: priority, insert: insert)
-    }
-
-    #if canImport(AsyncDisplayKit)
-    func register(matchBlock:@escaping RELCellSelector.MatchBlock, cellBlock: @escaping RELCellSelector.NodeCellBlock, priority: Priority = Priority.medium, insert:Bool=false) {
-        let selector = RELCellSelector(matchBlock: matchBlock, cellBlock: cellBlock)
-        self.register(selector)
-    }
-    #endif
-
 }
 
 public extension RELCellSelectorManager {
 
-    func collectionViewRegister(collectionView:UICollectionView) {
-        ///从小优先级开始注册
-        for i in self.prioritySelectorPairs.reversed() {
-            for j in i.selectors.reversed() {
-                guard let id = j.identifier else {continue}
-
-                if let kind = j.supplementaryViewOfKind {
-                    //注册SupplementaryView
-                    if let nib = j.collectionViewRegisterObject as? UINib {
-                        collectionView.register(nib, forSupplementaryViewOfKind: kind, withReuseIdentifier: id)
-                    }else if let classs = j.collectionViewRegisterObject as? AnyClass {
-                        collectionView.register(classs, forSupplementaryViewOfKind: kind, withReuseIdentifier: id)
+    ///register cells for a list view if the selector is in register mode
+    func listViewRegistering(listView: AnyObject) {
+        for pair in self.prioritySelectorPairs.reversed() {
+            for selector in pair.selectors.reversed() {
+                guard let identifier = selector.reuseIdentifier else {continue}
+                if let nib = selector.cellRegistration as? UINib {
+                    if let cv = listView as? UICollectionView {
+                        cv.register(nib, forCellWithReuseIdentifier: identifier)
+                    }else if let tv = listView as? UITableView {
+                        tv.register(nib, forCellReuseIdentifier: identifier)
                     }
-                }else {
-                    //注册Cell
-                    if let classs = j.collectionViewRegisterObject as? UICollectionViewCell.Type {
-                        collectionView.register(classs, forCellWithReuseIdentifier: id)
-                    }else if let nib = j.collectionViewRegisterObject as? UINib {
-                        collectionView.register(nib, forCellWithReuseIdentifier: id)
+                }else if let classs = selector.cellRegistration as? AnyClass {
+                    if let cv = listView as? UICollectionView {
+                        cv.register(classs, forCellWithReuseIdentifier: identifier)
+                    }else if let tv = listView as? UITableView {
+                        tv.register(classs, forCellReuseIdentifier: identifier)
                     }
                 }
             }

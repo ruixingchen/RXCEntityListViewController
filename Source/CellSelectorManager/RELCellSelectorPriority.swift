@@ -8,7 +8,7 @@
 
 import Foundation
 
-public struct RELCellSelectorPriority: ExpressibleByIntegerLiteral, Equatable, Comparable {
+public struct RELCellSelectorPriority: ExpressibleByIntegerLiteral, Strideable, Equatable, Comparable {
     
     public static func < (lhs: RELCellSelectorPriority, rhs: RELCellSelectorPriority) -> Bool {
         return lhs.value < rhs.value
@@ -31,7 +31,7 @@ public struct RELCellSelectorPriority: ExpressibleByIntegerLiteral, Equatable, C
     }
 
     public static var max: RELCellSelectorPriority {
-        return RELCellSelectorPriority(IntegerLiteralType.max)
+        return RELCellSelectorPriority(ValueType.max)
     }
 
     public static var high: RELCellSelectorPriority {
@@ -46,21 +46,30 @@ public struct RELCellSelectorPriority: ExpressibleByIntegerLiteral, Equatable, C
         return 250
     }
 
-    public static var lowest: RELCellSelectorPriority {
-        return RELCellSelectorPriority(IntegerLiteralType.min)
+    public static var min: RELCellSelectorPriority {
+        return RELCellSelectorPriority(ValueType.min)
     }
 
     public typealias ValueType = UInt16
+    public typealias Stride = UInt16
     public typealias IntegerLiteralType = UInt16
 
     public let value: ValueType
 
-    public init(integerLiteral value: Self.IntegerLiteralType) {
+    public init(_ value: ValueType) {
         self.value = value
     }
 
-    public init(_ value: ValueType) {
+    public init(integerLiteral value: RELCellSelectorPriority.ValueType) {
         self.value = value
+    }
+
+    public func advanced(by n: RELCellSelectorPriority.Stride) -> RELCellSelectorPriority {
+        return RELCellSelectorPriority(self.value + n)
+    }
+
+    public func distance(to other: RELCellSelectorPriority) -> RELCellSelectorPriority.Stride {
+        return other.value - self.value
     }
 
 }

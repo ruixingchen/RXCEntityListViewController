@@ -7,10 +7,13 @@
 //
 
 import Foundation
+import RXCSwiftComponents
 
+///描述一个可以进行数据绑定的对象
+public typealias RELDataBindableObjectProtocol = RXCBindableObjectProtocol
 
-public protocol RELDataBindableObjectProtocol {
-
-    func bindData(object:Any?, userInfo:[AnyHashable:Any]?)
-
-}
+//public protocol RELDataBindableObjectProtocol {
+//
+//    func bindData(object:Any?, userInfo:[AnyHashable:Any]?)
+//
+//}

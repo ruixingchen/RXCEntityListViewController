@@ -4,14 +4,19 @@
 target 'RXCEntityListViewController' do
   # Comment the next line if you don't want to use dynamic frameworks
   use_frameworks!
+  
+  pod 'Texture', '~> 2.8'
+  pod 'RXCFirstTimeViewController', :git=> 'https://github.com/ruixingchen/RXCFirsrTimeViewController.git'
+  pod 'RXCLoadingStateManager', :path=> '../RXCLoadingStateManager'
 
-  pod 'RXCDiffArray', '~> 1.1'
-  pod 'RXCDiffArray/DifferenceKit'
-  pod 'RXCDiffArray/ASDKExtension'
-  pod 'Texture'
+  pod 'RXCDiffArray', :path=> '../RXCDiffArray'
+  pod 'RXCDiffArray/DifferenceKit', :path=> '../RXCDiffArray'
+  pod 'RXCDiffArray/ASDKExtension', :path=> '../RXCDiffArray'
+
   pod 'RXCSwiftComponents', :path=> '../RXCSwiftComponents'
   pod 'RXCSwiftComponents/Texture', :path=> '../RXCSwiftComponents'
   pod 'RXCSwiftComponents/MJRefresh', :path=> '../RXCSwiftComponents'
+  pod 'RXCSwiftComponents/Alamofire', :path=> '../RXCSwiftComponents'
 
 
 end

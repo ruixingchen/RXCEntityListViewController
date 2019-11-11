@@ -7,7 +7,9 @@
 //
 
 import Foundation
+#if canImport(RXCDiffArray)
 import RXCDiffArray
+#endif
 
 public protocol RELCardProtocol: RELEntityProtocol {
 
@@ -16,22 +18,37 @@ public protocol RELCardProtocol: RELEntityProtocol {
 
 }
 
-//public class SimpleCard: RELCardProtocol {
-//
-//    var card:RELCard
-//
-//    public var rel_cardObjects: [Any]? {
-//        get {return self.card.rel_cardObjects}
-//        set {self.card.rel_cardObjects = newValue}
-//    }
-//
-//    public var rda_elements: [Any] {
-//        get {
-//            return self.card.rel_cardObjects ?? []
-//        }
-//        set {
-//            self.card.rel_cardObjects = newValue
-//        }
-//    }
-//
-//}
+#if canImport(RXCDiffArray)
+public protocol RELSectionCardProtocol: RELCardProtocol, RDADiffableSectionElementProtocol {
+
+}
+#else
+public protocol RELSectionCardProtocol: RELCardProtocol {
+
+}
+#endif
+
+///将RELCardProtocol包装成一个类
+open class RELSectionCardProtocolWrapper: RELSectionCardProtocol {
+
+    open var card:RELSectionCardProtocol
+
+    open var rel_cardObjects: [Any]? {
+        get {return self.card.rel_cardObjects}
+        set {self.card.rel_cardObjects = newValue}
+    }
+
+    open var rda_diffIdentifier: AnyHashable {return self.card.rda_diffIdentifier}
+
+    open var rda_diffableElements: [RDADiffableRowElementProtocol] {return self.card.rda_diffableElements}
+
+    open var rda_elements: [Any] {
+        get {return self.card.rda_elements}
+        set {self.card.rda_elements = newValue}
+    }
+
+    public init(card:RELSectionCardProtocol) {
+        self.card = card
+    }
+
+}

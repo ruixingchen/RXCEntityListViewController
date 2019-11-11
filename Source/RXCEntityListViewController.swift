@@ -16,14 +16,17 @@ import RXCDiffArray
 #if canImport(DifferenceKit)
 import DifferenceKit
 #endif
-#if canImport(Alamofire)
-import Alamofire
-#endif
 #if canImport(MJRefresh)
 import MJRefresh
 #endif
 #if canImport(RXCSwiftComponents)
 import RXCSwiftComponents
+#endif
+#if canImport(RXCFirstTimeViewController)
+import RXCFirstTimeViewController
+#endif
+#if canImport(RXCLoadingStateManager)
+import RXCLoadingStateManager
 #endif
 
 #if !(CanUseASDK || canImport(AsyncDisplayKit))
@@ -71,45 +74,32 @@ public extension RXCEntityListViewController {
 
 /*
 通用界面的思路描述：
- 关于数据源：采用双数据源，一个保存服务器传来的原始数据留作存档， 一个是本地化后的数据源，本地数据源可以添加一些特殊的占位数据而不影响服务器数据的整体顺序，但是要求更新数据源的时候要针对两个数据源都进行更新
-
  关于数据请求：页面第一次将要显示的时候，进行初始化请求，默认的初始化请求是一个底部刷新行为，接收到请求后，进入数据处理，数据合并，更新UI，请求结束几个流程，下面是对几个流程的工作内容描述：
-    数据处理阶段 1：服务器数据会有一些配置型的数据混在返回数据中，遍历返回的数据，处理配置型数据后删除这些配置型数据
-    数据处理阶段 2: 根据页面的不同，通过上阶段1的数据计算出一份本地数据，例如添加一些分割线，添加一些占位图等等
-    数据合并：      将上一步生成的两份数据合并到本地的数据源中
-    更新UI：       在处理数据之前，记录下本地数据的状态，之后将新数据和旧数据做对比，根据Diff结果更新UI
+    数据处理阶段：服务器数据会有一些配置型的数据混在返回数据中，通过processor来处理数据
+    数据合并：   将上一步生成的两份数据合并到本地的数据源中
+    更新UI：    在处理数据之前，记录下本地数据的状态，之后将新数据和旧数据做对比，根据Diff结果更新UI
 
  */
 
-open class RXCEntityListViewController: RELFirstTimeViewController, ASTableDataSource, ASTableDelegate, ASCollectionDataSource, ASCollectionDelegate, UITableViewDataSource, UITableViewDelegate, UICollectionViewDataSource, UICollectionViewDelegate, RXCDiffArrayDelegate {
+open class RXCEntityListViewController: RXCFirstTimeViewController, ASTableDataSource, ASTableDelegate, ASCollectionDataSource, ASCollectionDelegate, UITableViewDataSource, UITableViewDelegate, UICollectionViewDataSource, UICollectionViewDelegate, RXCDiffArrayDelegate {
 
-    public typealias SectionELement = RELCardProtocol
-    public typealias RowElement = RELEntityProtocol
+    public typealias SectionELement = RELSectionCardProtocolWrapper
+    public typealias RowElement = RELRowEntityProtocolWrapper
     public typealias DataList = RXCDiffArray<[SectionELement]>
     //下面的别名是为了方便我们整合代码, 当需要修改的时候直接改这里就好, 降低复杂度, 为了通用性考虑, 默认直接采用AnyObject也是极好的
-    public typealias ListRequestSpec = AnyObject
+    public typealias ListRequestSpec = RELEntityListRequestSpec
+    public typealias ListRequestResponse = RELListRequestResponseSpec<[RowElement]>
     public typealias ListRequestTask = AnyObject
-    public typealias ListRequestResponse = AnyObject
 
     internal var _listViewObject:RXCListViewProtocol?
     ///本地存储列表视图的指针
     open var listViewObject: RXCListViewProtocol {
         if self._listViewObject == nil {
             self._listViewObject = self.initListView()
+            self.registerCellOrNibForListView()
         }
         return self._listViewObject!
     }
-
-    #if (CanUseASDK || canImport(AsyncDisplayKit))
-
-    open var tableNode: ASTableNode! {
-        return self.listViewObject as? ASTableNode
-    }
-
-    open var collectionNode: ASCollectionNode! {
-        return self.listViewObject as? ASCollectionNode
-    }
-    #endif
 
     open var tableView: UITableView! {
         if let tv = self.listViewObject as? UITableView {
@@ -135,15 +125,34 @@ open class RXCEntityListViewController: RELFirstTimeViewController, ASTableDataS
         return nil
     }
 
+    #if (CanUseASDK || canImport(AsyncDisplayKit))
+    open var tableNode: ASTableNode! {
+        return self.listViewObject as? ASTableNode
+    }
+
+    open var collectionNode: ASCollectionNode! {
+        return self.listViewObject as? ASCollectionNode
+    }
+    #endif
+
     //MARK: - UI 及其相关
 
+    internal var _cellSelectorManager: RELCellSelectorManager?
     ///cell的选择器, 需要在初始化方法中初始化之后使用
-    open var cellSelectorManager: RELCellSelectorManager!
+    open var cellSelectorManager: RELCellSelectorManager {
+        if self._cellSelectorManager == nil {
+            self._cellSelectorManager = self.initCellSelectorManager()
+        }
+        return self._cellSelectorManager!
+    }
 
     ///请求状态管理器, 用于在进行列表页请求的时候显示合适的loading图标, 加载失败的时候显示合适的文案
-    open var requestStateManager:AnyObject?
+    open var loadingStateManager:RXCLoadingStateManager?
 
     //MARK: - 数据 / Data
+
+    ///专门用来操作数据源的queue, 所有对数据源的操作都必须在这个queue里面
+    open lazy var dataListOperationQueue:DispatchQueue = DispatchQueue.init(label: "dataListOperationQueue", qos: .default, attributes: .concurrent)
 
     internal var _localDataList:DataList?
     open var localDataList: DataList {
@@ -153,8 +162,26 @@ open class RXCEntityListViewController: RELFirstTimeViewController, ASTableDataS
         return self.localDataList
     }
 
+    ///安全地读取数据源, 所有的读取操作都必须在这里执行
+    open func safeReadDataList(closure:@escaping()->Void) {
+        self.dataListOperationQueue.sync(execute: closure)
+    }
+
+    ///安全地操作本地数据源, 所有的修改操作都必须在这里执行
+    open func safeOperatingDataList(closure:@escaping()->Void) {
+        let g = DispatchGroup()
+        self.dataListOperationQueue.async(group: g, qos: .default, flags: .barrier, execute: closure)
+        g.wait()
+    }
+
+    internal var _dataProcessors: [RELListRequestDataProcessorProtocol]?
     ///当请求到数据后, 按照顺序让数据处理器对新请求到的数据进行处理或者过滤
-    open var dataProcessors: [RELListRequestDataProcessorProtocol] = []
+    open var dataProcessors: [RELListRequestDataProcessorProtocol] {
+        if self._dataProcessors == nil {
+            self._dataProcessors = self.initDataProcessors()
+        }
+        return self._dataProcessors!
+    }
 
     ///当前列表数据的最大页码, 为0表示当前没有进行请求
     open var page: Int = 0
@@ -164,10 +191,12 @@ open class RXCEntityListViewController: RELFirstTimeViewController, ASTableDataS
     ///自动内容控制，当数据源发生变化的时候自动更新ListView
     open var autoContentControl: Bool = true
 
+    ///是否使用CollectionView作为ListView
+    open var useCollectionView: Bool
     #if (CanUseASDK || canImport(AsyncDisplayKit))
+    ///是否使用ASDK
     open var useASDK: Bool
     #endif
-    open var useCollectionView: Bool
 
     //MARK: - 请求相关
 
@@ -180,10 +209,6 @@ open class RXCEntityListViewController: RELFirstTimeViewController, ASTableDataS
     ///列表是否还有更多内容
     open var hasMoreData: Bool = true
 
-    ///初始化请求是否已经完成，如果没有完成表示没有数据
-    ///暂不使用
-    //open var initRequestCalled:Bool = false
-
     ///头部刷新组件指针, 用于确定是否安装了头部刷新组件
     open var headerRefreshComponent: AnyObject?
 
@@ -194,7 +219,7 @@ open class RXCEntityListViewController: RELFirstTimeViewController, ASTableDataS
     //MARK: - 性能
 
     #if (CanUseASDK || canImport(AsyncDisplayKit))
-    ///添加或者更新Cell的时候可能会引起闪烁, 每次更新之前, 将要更新的Cell的位置加入这个数组, TableNode在返回Cell的时候会将这个Cell的neverShowPlaceholder设置为true, 一段时间后再改回falsse, 之后将该indexPath从本数组删除, 解决办法来自贝聊科技的文章
+    ///添加或者更新Cell的时候可能会引起闪烁, 每次reloadRow之前, 将要reload的Cell的位置加入这个数组, TableNode在返回Cell的时候会将这个Cell的neverShowPlaceholder设置为true, 一段时间后再改回false, 之后将该indexPath从本数组删除, 解决办法来自贝聊科技的文章
     open var neverShowPlaceholderIndexPaths: [IndexPath] = []
     #endif
 
@@ -205,30 +230,16 @@ open class RXCEntityListViewController: RELFirstTimeViewController, ASTableDataS
         self.useASDK = useASDK
         self.useCollectionView = useCollectionView
         super.init(nibName: nil, bundle: nil)
-        //这里的初始化顺序不要改
-        self.initCellSelectorManager()
-        self.initListView()
-        let _ = self.localDataList
-        self.initDataProcessors()
     }
     #else
     public init(style: UITableView.Style, useCollectionView: Bool) {
         self.useCollectionView = useCollectionView
         super.init(nibName: nil, bundle: nil)
-        self.initCellSelectorManager()
-        self.initListView()
-        self.initDataList()
-        self.initDataProcessors()
     }
     #endif
 
     required public init?(coder: NSCoder) {
         fatalError("init(coder:) has not been implemented")
-    }
-
-    open func initCellSelectorManager() {
-        self.cellSelectorManager = RELCellSelectorManager()
-        //子类可以override之后注册需要的选择器
     }
 
     ///初始化数据源
@@ -239,7 +250,13 @@ open class RXCEntityListViewController: RELFirstTimeViewController, ASTableDataS
         return dataList
     }
 
-    ///初始化列表视图, 返回初始化好的ListView
+    //子类可以override之后注册需要的选择器
+    //务必注意引用循环的问题, 如果selector要引用self, 必须使用weak, 否则一定会循环
+    open func initCellSelectorManager()->RELCellSelectorManager {
+        fatalError("MUST OVERRIDE THIS FUNCTION TO RETURN A MANAGER")
+    }
+
+    ///初始化列表视图, 返回初始化好的ListView, 默认根据参数初始化一个系统自带的View, 不建议使用继承后的各种ListView, 会有各种问题
     open func initListView()->RXCListViewProtocol {
         #if (CanUseASDK || canImport(AsyncDisplayKit))
         if self.useASDK {
@@ -273,15 +290,14 @@ open class RXCEntityListViewController: RELFirstTimeViewController, ASTableDataS
         }
     }
 
-    ///如果要使用TableView的注册模式或者CollectionView, 需要在这里执行注册方法
-    open func registerCellOrNibForListView() {
-        if let view = self.listViewObject as? UICollectionView {
-            self.cellSelectorManager.collectionViewRegister(collectionView: view)
-        }
+    ///默认返回空数组, 有需要的话可以override
+    open func initDataProcessors()->[RELListRequestDataProcessorProtocol] {
+        return []
     }
 
-    open func initDataProcessors() {
-
+    ///如果要使用TableView的注册模式或者CollectionView, 需要在这里执行注册方法, 如果有需要特殊的注册, 重写后自己注册即可
+    open func registerCellOrNibForListView() {
+        self.cellSelectorManager.listViewRegistering(listView: self.listViewObject)
     }
 
     //MARK: - 生命周期 / LifeCycle
@@ -298,7 +314,6 @@ open class RXCEntityListViewController: RELFirstTimeViewController, ASTableDataS
             }
             #endif
         }
-
     }
 
     ///在添加到View之前最后一次设置ListView的各项属性
@@ -311,10 +326,10 @@ open class RXCEntityListViewController: RELFirstTimeViewController, ASTableDataS
 
     }
 
-    open override func viewWillAppear_first(_ animated: Bool) {
-        super.viewWillAppear_first(animated)
-        //第一次出现的时候请求数据
-        self.initRequest()
+    open override func rxc_viewWillAppear_first(_ animated: Bool) {
+        super.rxc_viewWillAppear_first(animated)
+        //第一次出现的时候请求数据, 子类自己重写后来决定什么时候发起请求
+        //self.startInitRequest()
     }
 
     open override func viewWillLayoutSubviews() {
@@ -324,14 +339,20 @@ open class RXCEntityListViewController: RELFirstTimeViewController, ASTableDataS
 
     ///调整ListView的位置
     open func layoutListView() {
-        self.listViewObject.frame = self.view.bounds
+        self.listViewObject.rsc_frame = self.view.bounds
     }
 
     //MARK: - 数据的读取和写入
 
     ///读取本地数据源位于指定位置的数据, 线程不安全
-    open func localRowElement(at indexPath:IndexPath)->RowElement? {
-        return self.localDataList.element(at: indexPath)
+    open func localRowElement(at indexPath:IndexPath)->RowElement {
+
+        let element = self.localDataList[indexPath.section].rda_elements[indexPath.row]
+        if let casted = element as? RowElement {
+            return casted
+        }else {
+            fatalError("本地数据源出现了非法类型:\(element)")
+        }
     }
 
     //MARK: - 操作 ListView
@@ -370,9 +391,9 @@ open class RXCEntityListViewController: RELFirstTimeViewController, ASTableDataS
             return
         }
         //这里由于ASDK也可以获取到指针, 直接用??一起获取了
-        if let obj = self.listViewObject as? UITableView ?? self.tableView, obj.refreshControl != nil {
+        if let obj = self.tableView, obj.refreshControl != nil {
             obj.refreshControl = nil
-        } else if let obj = self.listViewObject as? UICollectionView ?? self.collectionView, obj.refreshControl != nil {
+        } else if let obj = self.collectionView, obj.refreshControl != nil {
             obj.refreshControl = nil
         } else {
             assertionFailure("无法找到合适的类型来卸载头部刷新组件:\(String(describing: self.listViewObject))")
@@ -382,32 +403,43 @@ open class RXCEntityListViewController: RELFirstTimeViewController, ASTableDataS
 
     ///安装底部刷新控件
     open func installFooterRefreshComponent() {
-
+        #if canImport(AsyncDisplayKit)
+        if self.useASDK {
+            self.footerRefreshComponent = NSObject()
+            return
+        }
+        #endif
+        fatalError("子类需要继承后重写本方法来安装底部刷新控件")
     }
 
     ///卸载底部刷新控件
     open func uninstallFooterRefreshComponent() {
-
+        #if canImport(AsyncDisplayKit)
+        if self.useASDK {
+            self.footerRefreshComponent = nil
+            return
+        }
+        #endif
+        fatalError("子类需要继承后重写本方法来卸载底部刷新控件")
     }
 
     /// 停止头部刷新控件
-    /// - Parameter success: 本次刷新是否成功
-    /// - Parameter hasMore: 是否还有更多数据
-    open func stopHeaderRefreshComponent(success:Bool, hasMore:Bool, userInfo:[AnyHashable:Any]?) {
+    open func stopHeaderRefreshComponent(userInfo:[AnyHashable:Any]?) {
         if let refresh = self.headerRefreshComponent as? UIRefreshControl {
             refresh.endRefreshing()
+            return
         }
         #if canImport(MJRefresh)
         if let refresh = self.headerRefreshComponent as? MJRefreshHeader {
             refresh.endRefreshing()
+            return
         }
         #endif
+        assertionFailure("没有找到匹配的头部刷新控件类型")
     }
 
     /// 停止底部刷新控件
-    /// - Parameter success: 本次刷新是否成功
-    /// - Parameter hasMore: 是否还有更多数据
-    open func stopFooterRefreshComponent(success:Bool, hasMore:Bool, userInfo:[AnyHashable:Any]?) {
+    open func stopFooterRefreshComponent(hasMoreData:Bool, userInfo:[AnyHashable:Any]?) {
         #if canImport(AsyncDisplayKit)
         if let batch = self.footerRefreshComponent as? AsyncDisplayKit.ASBatchContext {
             batch.completeBatchFetching(true)
@@ -416,7 +448,12 @@ open class RXCEntityListViewController: RELFirstTimeViewController, ASTableDataS
         #endif
         #if canImport(MJRefresh)
         if let refresh = self.footerRefreshComponent as? MJRefreshFooter {
-            refresh.endRefreshing()
+            if hasMoreData {
+                refresh.endRefreshing()
+            }else {
+                refresh.endRefreshingWithNoMoreData()
+            }
+            return
         }
         #endif
         assertionFailure("没有找到匹配的底部刷新控件类型")
@@ -432,13 +469,12 @@ open class RXCEntityListViewController: RELFirstTimeViewController, ASTableDataS
         return self.localDataList[section].rda_elements.count
     }
 
-    //除非需要对Cell做特殊处理, 否则子类无需override本方法
+    ///除非需要对Cell做特殊处理, 否则子类无需override本方法
     open func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
         let element = self.localRowElement(at: indexPath)
-        if element == nil {
-            assertionFailure("无法获取IndexPath:\(indexPath)对应的元素")
-        }
-        let userInfo:[AnyHashable:Any] = ["indexPath": indexPath]
+        var userInfo:[AnyHashable:Any] = ["indexPath": indexPath]
+        userInfo["listView"] = tableView
+        userInfo["viewController"] = self
 
         if let cell = self.cellSelectorManager.retriveCell(for: tableView, object: element, indexPath: indexPath, includeDefault: true, userInfoForBindData: userInfo) {
             return cell
@@ -460,10 +496,9 @@ open class RXCEntityListViewController: RELFirstTimeViewController, ASTableDataS
 
     open func collectionView(_ collectionView: UICollectionView, cellForItemAt indexPath: IndexPath) -> UICollectionViewCell {
         let element = self.localRowElement(at: indexPath)
-        if element == nil {
-            assertionFailure("无法获取IndexPath:\(indexPath)对应的元素")
-        }
-        let userInfo:[AnyHashable:Any] = ["indexPath": indexPath]
+        var userInfo:[AnyHashable:Any] = ["indexPath": indexPath]
+        userInfo["listView"] = collectionView
+        userInfo["viewController"] = self
 
         if let cell = self.cellSelectorManager.retriveCell(for: collectionView, object: element, indexPath: indexPath, includeDefault: true, userInfoForBindData: userInfo) {
             return cell
@@ -479,10 +514,9 @@ open class RXCEntityListViewController: RELFirstTimeViewController, ASTableDataS
     ///ASTableNode和ASCollectionNode的返回Cell的函数是类似的, 整合到这个方法中一起执行
     open func listNode(_ node:ASDisplayNode, nodeBlockForRowAt indexPath: IndexPath) -> ASCellNodeBlock {
         let element = self.localRowElement(at: indexPath)
-        if element == nil {
-            assertionFailure("无法获取IndexPath:\(indexPath)对应的元素")
-        }
-        let userInfo:[AnyHashable:Any] = ["indexPath": indexPath]
+        var userInfo:[AnyHashable:Any] = ["indexPath": indexPath]
+        userInfo["listView"] = node
+        userInfo["viewController"] = self
 
         return { [weak self] () in
             var cell:ASCellNode?
@@ -543,27 +577,93 @@ open class RXCEntityListViewController: RELFirstTimeViewController, ASTableDataS
         }
     }
 
+    public func shouldBatchFetch(for tableNode: ASTableNode) -> Bool {
+        return self.canTakeFooterRefreshRequest()
+    }
+
+    public func shouldBatchFetch(for collectionNode: ASCollectionNode) -> Bool {
+        return self.canTakeFooterRefreshRequest()
+    }
+
+    public func tableNode(_ tableNode: ASTableNode, willBeginBatchFetchWith context: ASBatchContext) {
+        //开始底部请求
+
+    }
+
+    public func collectionNode(_ collectionNode: ASCollectionNode, willBeginBatchFetchWith context: ASBatchContext) {
+
+    }
+
     #endif
 
-    //MARK: - ListView 操作
-
-    open func listView_appendSection(card:Card) {
-
-    }
-
-    open func listView_appendRow(in section: Int, entities:[Entity]) {
-
-    }
-
-    open func listView_reloadRow(at indexPaths:[IndexPath], animation: UITableView.RowAnimation) {
-        
-    }
+    ////MARK: - ListView 操作
 
     //MARK: - RXCDiffArrayDelegate
-    open func diffArray<SectionContainer, RowElement>(array: RXCDiffArray<SectionContainer, RowElement>, didChange difference: RDADifference<SectionContainer.Element, RowElement>, userInfo: [AnyHashable: Any]?) where SectionContainer: RangeReplaceableCollection {
-        let batch = userInfo?["batch"] as? Bool ?? true
-        self.listViewObject.reload(userInfo: userInfo, with: difference, animations: RDATableViewAnimations.automatic(), batch: batch) { (finish) in
-            print("差异映射UI结束: \(finish)")
+
+    open func diffArray<ElementContainer>(diffArray: RXCDiffArray<ElementContainer>, didModifiedWith differences: [RDADifference<ElementContainer>]) where ElementContainer : RangeReplaceableCollection {
+
+        if let __tableView = self.listViewObject as? UITableView {
+            for i in differences {
+                __tableView.reload(with: i, animations: .none(), reloadDataSource: { (newData) in
+                    self.safeOperatingDataList {
+                        self.localDataList.removeAll(userInfo: [DataList.Key.notify as AnyHashable: false], where: {_ in true})
+                        self.localDataList.add(contentsOf: newData as! [SectionELement], userInfo: [DataList.Key.notify: false])
+                    }
+                }) { (finish) in
+
+                }
+            }
+        }else if let __collectionView = self.listViewObject as? UICollectionView {
+            for i in differences {
+                __collectionView.reload(with: i, animations: .none(), reloadDataSource: { (newData) in
+                    self.safeOperatingDataList {
+                        self.localDataList.removeAll(userInfo: [DataList.Key.notify as AnyHashable: false], where: {_ in true})
+                        self.localDataList.add(contentsOf: newData as! [SectionELement], userInfo: [DataList.Key.notify: false])
+                    }
+                }) { (finish) in
+
+                }
+            }
+        }else {
+            #if (CanUseASDK || canImport(AsyncDisplayKit))
+            if self.listViewObject is ASDisplayNode {
+                for i in differences {
+                    for j in i.changes {
+                        switch j {
+                        case .elementInsert(offset: let row, section: let section):
+                            self.neverShowPlaceholderIndexPaths.append(IndexPath(row: row, section: section))
+                        case .elementUpdate(offset: let row, section: let section):
+                            self.neverShowPlaceholderIndexPaths.append(IndexPath(row: row, section: section))
+                        default: break
+                        }
+                    }
+                }
+            }
+
+            if let __tableNode = self.listViewObject as? ASTableNode {
+                for i in differences {
+                    __tableNode.reload(with: i, animations: .none(), reloadDataSource: { (newData) in
+                        self.safeOperatingDataList {
+                            self.localDataList.removeAll(userInfo: [DataList.Key.notify as AnyHashable: false], where: {_ in true})
+                            self.localDataList.add(contentsOf: newData as! [SectionELement], userInfo: [DataList.Key.notify: false])
+                        }
+                    }) { (finish) in
+
+                    }
+                }
+            }else if let __collectionNode = self.listViewObject as? ASCollectionNode {
+                for i in differences {
+                    __collectionNode.reload(with: i, animations: .none(), reloadDataSource: { (newData) in
+                        self.safeOperatingDataList {
+                            self.localDataList.removeAll(userInfo: [DataList.Key.notify as AnyHashable: false], where: {_ in true})
+                            self.localDataList.add(contentsOf: newData as! [SectionELement], userInfo: [DataList.Key.notify: false])
+                        }
+                    }) { (finish) in
+
+                    }
+                }
+            }
+            #endif
         }
     }
 
@@ -582,12 +682,6 @@ open class RXCEntityListViewController: RELFirstTimeViewController, ASTableDataS
             req.cancel()
             return
         }
-        #if canImport(Alamofire)
-        if let req = self.headerRequest as? Alamofire.Request {
-            req.cancel()
-            return
-        }
-        #endif
         fatalError("子类需要重写来实现功能")
     }
 
@@ -596,12 +690,6 @@ open class RXCEntityListViewController: RELFirstTimeViewController, ASTableDataS
             req.cancel()
             return
         }
-        #if canImport(Alamofire)
-        if let req = self.headerRequest as? Alamofire.Request {
-            req.cancel()
-            return
-        }
-        #endif
         fatalError("子类需要重写来实现功能")
     }
 
@@ -623,31 +711,65 @@ open class RXCEntityListViewController: RELFirstTimeViewController, ASTableDataS
     }
 
     ///结束一个头部刷新, 典型操作是结束刷新控件的刷新
-    open func endHeaderRefresh(success:Bool, hasMore:Bool, userInfo:[AnyHashable:Any]?) {
-        self.stopHeaderRefreshComponent(success: success, hasMore: hasMore, userInfo: userInfo)
+    open func endHeaderRefresh(userInfo:[AnyHashable:Any]?) {
+        self.stopHeaderRefreshComponent(userInfo: userInfo)
+        self.headerRequest = nil
     }
 
     ///结束一个底部刷新, 典型操作是结束刷新控件的刷新
-    open func endFooterRefresh(success:Bool, hasMore:Bool, userInfo:[AnyHashable:Any]?) {
-        self.stopFooterRefreshComponent(success: success, hasMore: hasMore, userInfo: userInfo)
+    open func endFooterRefresh(hasMoreData:Bool, userInfo:[AnyHashable:Any]?) {
+        self.stopFooterRefreshComponent(hasMoreData: hasMoreData, userInfo: userInfo)
+        self.hasMoreData = hasMoreData
+        self.footerRequest = nil
     }
 
     //MARK: - 请求逻辑
 
-    ///这个函数可以接收头部刷新传来的事件
+    ///这个函数可以接收头部刷新控件传来的要求进行刷新的事件
     @objc open func headerRefreshAction(sender: Any?) {
         //当执行头部刷新的时候, 先取消底部刷新, 防止干扰
         guard self.canTakeHeaderRefreshRequest() else {
             return
         }
-        //取消请求后会同时结束刷新
         self.cancelFooterRefreshRequest()
     }
 
-    ///前置请求, 有些界面需要有前置请求, 根据前置请求的结果来决定列表页的接口
-    open func initRequest() {
+
+
+    ///开始前置请求, 有些界面需要有前置请求, 根据前置请求的结果来决定列表页的接口
+    ///默认没有前置请求, 直接调用底部刷新接口
+    open func startInitRequest() {
         //请求完毕后安装底部刷新控件, 之后就能正常启用列表请求的逻辑
         //默认没有前置请求，直接判断为前置请求完成
+        //如果需要前置请求, 可以重写后进行请求, 请求完毕之后, 设置头尾的刷新控件即可
+        //example:
+        /*
+        self.loadingStateManager?.startLoading()
+        let request = URLRequest(url: URL(string: "https://www.baidu.com")!)
+        let task = URLSession.shared.dataTask(with: request) { (data, response, error) in
+            if error != nil {
+                self.loadingStateManager?.finishLoading(success: false)
+            }else {
+                //合并数据
+                self.safeOperatingDataList {
+                    var diff:[DataList.Difference]!
+                    self.safeOperatingDataList {
+                        diff = self.localDataList.batchWithDifferenceKit_2D {
+                            //在这里插入数据
+                        }
+                    }
+                    self.diffArray(diffArray: self.localDataList, didModifiedWith: diff)
+                }
+                self.loadingStateManager?.finishLoading(success: true)
+                self.installHeaderRefreshComponent()
+                self.installFooterRefreshComponent()
+            }
+        }
+        task.resume()
+         */
+        //下面是默认的请求
+        let spec = self.listRequestSpec(requestType: .footerRefresh, page: self.page+1, userInfo: nil)
+        self.startListRequest(requestSpec: spec, userInfo: nil)
     }
 
     ///返回列表页请求的URL
@@ -657,143 +779,158 @@ open class RXCEntityListViewController: RELFirstTimeViewController, ASTableDataS
 
     ///返回列表页请求的描述对象
     open func listRequestSpec(requestType: ListRequestType, page: Int, userInfo: [AnyHashable: Any]?) -> ListRequestSpec {
-        let url = self.listRequestUrl(requestType: requestType, page: page, userInfo:userInfo)
-        let headers = APIService.Util.makeHeader()
-        let spec = ListRequestSpec.init(url: url, requestType: requestType)
-        return spec
-    }
-
-    //开始请求
-    open func startListRequest(requestSpec: ListRequestSpec, userInfo: [AnyHashable: Any]?) {
-        //默认请求到的数据是一个数组, 至于数组内部的对象则根据请求接口不一样而不一样
-        let request = APIServiceV2.shared.basicRequest(requestSpec: requestSpec) {[weak self] (result:ListRequestResponse) in
-            self?.onListRequestResponse(requestSpec: requestSpec, response: result, userInfo: nil)
-        }
-        switch requestSpec.requestType {
-        case .headerRefresh:
-            self.headerRequest = request
-        case .footerRefresh:
-            self.footerRequest = request
-        }
-    }
-
-    ///请求接收到回应
-    open func onListRequestResponse(requestSpec: ListRequestSpec, response: ListRequestResponse, userInfo: [AnyHashable: Any]?) {
-        ///接收到服务器的回应后，根据回应进入不同的处理分支
-
-    }
-
-    ///请求没有正确完成，任何错误都会进入本流程
-    open func onListRequestResponseError(requestSpec: ListRequestSpec, response: ListRequestResponse, userInfo: [AnyHashable: Any]?) {
-
+        fatalError("本方法应由子类提供实现")
+        //let url = self.listRequestUrl(requestType: requestType, page: page, userInfo:userInfo)
+        //let spec = RELEntityListRequestSpec.init(url: url, requestType: requestType)
+        //return spec
     }
 
     ///根据服务器的返回结果判断列表后面是否还有数据
     open func hasMoreDataAfter(requestSpec: ListRequestSpec, response: ListRequestResponse, userInfo: [AnyHashable: Any]?) -> Bool {
         //由于很多时候判断后面是否还有数据的方法不尽相同, 这里采用一个函数来处理
-        //一般我们判断的标准是服务器返回了空数组，但是有些界面需要重写本方法，比如综合搜索的第一页就有可能返回空数组但是后面还有数据
-        if let data = response.data {
-            return data.isEmpty
+        fatalError("本方法应由子类提供实现")
+        //下面是example
+        /*
+        if requestSpec.requestType == .headerRefresh {
+            return true
         }
-        //默认是还有数据
-        return true
+        if response.isSuccess {
+            return (response.result.value?.count ?? 0) > 0
+        }else {
+            ///请求没有成功的情况下, 默认后面还有数据, 方便进行下一次请求
+            return true
+        }
+         */
     }
 
-    ///服务器传来了没有更多数据的标记，这是一个单独的分支，进入后处理一下hasMoreData的标记后就可以结束请求了
-    open func onListRequestResponseNoMoreData(requestSpec: ListRequestSpec, response: ListRequestResponse, userInfo: [AnyHashable: Any]?) {
-
-
-
+    ///数据合并的时候, 新的数据应该合并到哪个section中? 默认是0
+    ///有时候我们需要在第0节显示占位信息, 这里就可以强制让新数据插入到其他节中了
+    open func listRequestDataMergeSection(requestSpec: ListRequestSpec, response: ListRequestResponse)->Int {
+        return 0
     }
 
-    //请求成功后的处理逻辑：success -> (process-> merge) -> updateUI
-    //success方法记录下当前的状态，之后调用process，process继续吊用merge， 之后success方法再调用updateUI，更新完之后调用end
-    //process：处理服务器传来的数据，
+    //开始请求
+    open func startListRequest(requestSpec: ListRequestSpec, userInfo: [AnyHashable: Any]?) {
+        //默认请求到的数据是一个数组, 至于数组内部的对象则根据请求接口不一样而不一样
+        fatalError("子类必须重写来实现请求")
+        //下面是example
+//        let request = APIServiceV2.shared.basicRequest(requestSpec: requestSpec) {[weak self] (result:ListRequestResponse) in
+//            self?.onListRequestResponse(requestSpec: requestSpec, response: result, userInfo: nil)
+//        }
+//        switch requestSpec.requestType {
+//        case .headerRefresh:
+//            self.headerRequest = request
+//        case .footerRefresh:
+//            self.footerRequest = request
+//        }
+    }
 
-    ///列表请求成功
+    ///请求接收到回应
+    open func onListRequestResponse(requestSpec: ListRequestSpec, response: ListRequestResponse, userInfo: [AnyHashable: Any]?) {
+        ///接收到服务器的回应后，根据回应进入不同的处理分支
+        if !response.isSuccess {
+            //请求失败分支
+            self.onListRequestResponseError(requestSpec: requestSpec, response: response, userInfo: userInfo)
+        }else {
+            //请求成功
+            self.onListRequestSuccess(requestSpec: requestSpec, response: response, userInfo: userInfo)
+        }
+    }
+
+    ///请求没有正确完成，任何错误都会进入本流程
+    open func onListRequestResponseError(requestSpec: ListRequestSpec, response: ListRequestResponse, userInfo: [AnyHashable: Any]?) {
+        fatalError("本方法应由子类提供实现")
+        //下面是example
+        /*
+        if response.error?.isURLErrorCancelled ?? false {
+            //请求被取消的时候不做任何处理
+            return
+        }
+        //请求错误后, 做出一些提示, 如弹出toast
+        self.loadingStateManager?.finishLoading(success: false)
+        self.hasMoreData = self.hasMoreDataAfter(requestSpec: requestSpec, response: response, userInfo: userInfo)
+        switch requestSpec.requestType {
+        case .headerRefresh:
+            self.endHeaderRefresh(userInfo: userInfo)
+        case .footerRefresh:
+            self.endFooterRefresh(hasMoreData: self.hasMoreData, userInfo: userInfo)
+        }
+         */
+    }
+
+    ///列表请求成功, 执行
     open func onListRequestSuccess(requestSpec: ListRequestSpec, response: ListRequestResponse, userInfo: [AnyHashable: Any]?) {
-
-        //由于本地列表的数据不可能很多, 最多最多最多也就1k-2k这个数量级, 我们采用diff来实现数据和UI同步, 采用DifferenceKit来实现
-
-        objc_sync_enter(self.listViewObject as Any)
-        objc_sync_enter(self)
-
         //这里可以采用两种方案，一种是利用DiffArray的batch方法，将修改包括在一个closure中，之后DiffArray可以自动计算并且返回差异
-        //另一种是手动记录当前的状态，之后直接调用后续阶段的方法，等数据处理合并阶段完成后，再手动计算差异
-        //这里我们用第二种方案，主要是考虑到第一种方案，所有的流程都在本方法
+        //另一种是手动记录当前的状态，之后直接调用后续阶段的方法，等数据处理合并阶段完成后，再计算差异
+        //目前选择第二种方法, 逻辑要清楚一些
+        objc_sync_enter(self.localDataList)
+        let oldData = self.localDataList.toArray()
 
-        let differences = self.localDataList.batchWithDifferenceKit {
-            //注意, 数据处理内部如果要操作本地列表数据, 一定要禁用DataList的通知，只操作数据不操作ListView的UI部分
-            //下面的方法将会链式调用
-            let newRemoteData = response.data!
-            self.onListRequestDataProcessing(requestSpec: requestSpec, response: response, newRemoteData: newRemoteData)
-        }
+        let animated = userInfo?["animated"] as? Bool ?? true
+        let enabledSave = UIView.areAnimationsEnabled
+        UIView.setAnimationsEnabled(animated)
 
-        //        let animated = userInfo?["animated"] as? Bool ?? true
-        //        let enabledSave = UIView.areAnimationsEnabled
-        //        UIView.setAnimationsEnabled(animated)
+        //注意, 数据处理内部如果要操作本地列表数据, 一定要禁用DataList的通知，只操作数据不操作ListView的UI部分
 
-        for i in differences {
-            if let data = i.dk_finalDataForCurrentStep {
-                self.localDataList.rda_removeAllSection(userInfo: [DataList.Key.notify: false], where: { _ in true })
-                self.localDataList.rda_appendSection(contentsOf: data, userInfo: [DataList.Key.notify: false])
-            }
-            self.listViewObject.reload(userInfo: nil, with: i, animations: RDATableViewAnimations.automatic(), batch: true) { (finish) in
-                print("数据Diff更新UI完成")
-            }
-        }
+        //处理数据
+        let processedNewData = self.listRequestDataProcessing(requestSpec: requestSpec, response: response, userInfo: userInfo)
+        //合并数据
+        self.listRequestDataMerge(requestSpec: requestSpec, response: response, processedNewData: processedNewData, userInfo: userInfo)
+        let newData = self.localDataList.toArray()
+        let diffs = DataList.Difference.differences_2D(between: oldData, and: newData)
+        //更新UI
+        self.onListRequestUpdateListView(differences: diffs, requestSpec: requestSpec, response: response, userInfo: userInfo, completion: nil)
 
-//        UIView.setAnimationsEnabled(enabledSave)
-        objc_sync_exit(self.listViewObject as Any)
-        objc_sync_exit(self)
+        UIView.setAnimationsEnabled(enabledSave)
+        objc_sync_exit(self.localDataList)
+
+        //请求结束
+        self.onListRequestEnd(requestSpec: requestSpec, response: response, userInfo: userInfo)
     }
 
     /// 数据处理第一阶段阶段, 这个阶段将对服务器传来的数据进行过滤和处理, 同时也可能会对现有列表进行修改, 比如删除重复项
     /// - Parameter response: 服务器传过来的请求
-    open func onListRequestDataProcessing(requestSpec: ListRequestSpec, response: ListRequestResponse, newRemoteData:[RowElement], userInfo: [AnyHashable: Any]?) {
-        var newDataList = response.data!
+    open func listRequestDataProcessing(requestSpec: ListRequestSpec, response: ListRequestResponse, userInfo: [AnyHashable: Any]?)->[RowElement] {
+        var newDataList:[RowElement] = response.result.value!
         for i in self.dataProcessors {
-            let processed = i.process(newObjects: newDataList, userInfo: nil) as? [Entity]
-            if processed == nil {
-                LogUtil.error("列表请求数据处理器返回了错误的类型")
-            }
+            let processed = i.process(newObjects: newDataList, userInfo: userInfo) as? [RowElement]
+            assert(processed != nil, "数据处理器返回了不正确的类型")
             newDataList = processed ?? newDataList
         }
-        let newResponse = ListRequestResponse(data: newDataList)
-        self.onListRequestRemoteDataToLocalData(requestSpec: requestSpec, response: newResponse, newRemoteData: newResponse)
-    }
-
-    /// 数据处理第二阶段，将上一步处理好的远程数据映射成一组本地数据，这里的典型操作是向远程数据中加入一些分割线数据等等，默认什么也不做
-    /// - Parameter requestSpec: 请求的描述
-    /// - Parameter response: 服务器返回的请求
-    /// - Parameter newRemoteData: <#newRemoteData description#>
-    open func onListRequestRemoteDataToLocalData(requestSpec: ListRequestSpec, response: ListRequestResponse, newRemoteData:[RowElement], userInfo: [AnyHashable: Any]?) {
-
+        return newDataList
     }
 
     /// 数据合并阶段, 这个阶段将服务器传来的数据合并到现有的列表中, 这个阶段不应该对上一步传过来的数据做修改
-    /// - Parameter requestSpec: 请求的描述
-    /// - Parameter localData: 处理后的本地数据
-    /// - Parameter remoteData: 处理过的远程数据
-    open func onListRequestDataMerge(requestSpec: ListRequestSpec, newLocalData:[RowElement], newRemoteData:[RowElement], userInfo: [AnyHashable: Any]?) {
-        //将 （服务器传来的数据，以及根据服务器数据计算的新的本地数据） 合并到本地数据源中, 之后数据合并阶段结束
+    open func listRequestDataMerge(requestSpec: ListRequestSpec,response: ListRequestResponse, processedNewData:[RowElement], userInfo: [AnyHashable: Any]?) {
+        let section = self.listRequestDataMergeSection(requestSpec: requestSpec, response: response)
+        var userInfo = userInfo ?? [:]
+        userInfo[DataList.Key.notify] = false
 
+        switch requestSpec.requestType {
+        case .headerRefresh:
+            self.localDataList.insertRow(contentsOf: processedNewData, at: 0, in: section, userInfo: userInfo)
+        case .footerRefresh:
+            self.localDataList.addRow(contentsOf: processedNewData, in: section, userInfo: userInfo)
+        }
 
-    }
-
-    ///列表数据请求更新列表对应的Section，默认是0
-    open func sectionForListRequestUpdateListView(requestSpec: ListRequestSpec, response: ListRequestResponse, userInfo: [AnyHashable: Any]?) -> Int {
-        return 0
     }
 
     ///更新UI阶段
-    open func onListRequestUpdateListView(differences:DataList.Difference, requestSpec: ListRequestSpec, response: ListRequestResponse, userInfo: [AnyHashable: Any]?, completion:(Bool)->Void) {
-
-        self.onListRequestEnd(requestSpec: requestSpec, response: response)
+    open func onListRequestUpdateListView(differences:[DataList.Difference], requestSpec: ListRequestSpec, response: ListRequestResponse, userInfo: [AnyHashable: Any]?, completion:((Bool)->Void)?) {
+        ///根据旧数据和新数据的对比, 计算出差异后应用到ListView上
+        self.diffArray(diffArray: self.localDataList, didModifiedWith: differences)
     }
 
-    open func onListRequestEnd(requestSpec: ListRequestSpec, response: ListRequestResponse) {
-
+    open func onListRequestEnd(requestSpec: ListRequestSpec, response: ListRequestResponse, userInfo: [AnyHashable: Any]?) {
+        switch requestSpec.requestType {
+        case .headerRefresh:
+            self.endHeaderRefresh(userInfo: userInfo)
+            self.installHeaderRefreshComponent()
+        case .footerRefresh:
+            let hasmoreData = self.hasMoreDataAfter(requestSpec: requestSpec, response: response, userInfo: userInfo)
+            self.endFooterRefresh(hasMoreData: hasmoreData, userInfo: userInfo)
+            self.installFooterRefreshComponent()
+        }
     }
 
 }

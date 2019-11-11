@@ -13,14 +13,13 @@
 		80C8D4DD236B2A3000664FC5 /* RELCellSelectorManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = 80C8D4C3236B2A3000664FC5 /* RELCellSelectorManager.swift */; };
 		80C8D4DE236B2A3000664FC5 /* RELCellSelectorPriority.swift in Sources */ = {isa = PBXBuildFile; fileRef = 80C8D4C4236B2A3000664FC5 /* RELCellSelectorPriority.swift */; };
 		80C8D4E0236B2A3000664FC5 /* RELCard.swift in Sources */ = {isa = PBXBuildFile; fileRef = 80C8D4C6236B2A3000664FC5 /* RELCard.swift */; };
-		80C8D4EB236B2A3000664FC5 /* EntityListRequestSpecV2.swift in Sources */ = {isa = PBXBuildFile; fileRef = 80C8D4D2236B2A3000664FC5 /* EntityListRequestSpecV2.swift */; };
+		80C8D4EB236B2A3000664FC5 /* RELEntityListRequestSpec.swift in Sources */ = {isa = PBXBuildFile; fileRef = 80C8D4D2236B2A3000664FC5 /* RELEntityListRequestSpec.swift */; };
 		80C8D4EF236B2A3000664FC5 /* RELListRequestDataProcessorProtocol.swift in Sources */ = {isa = PBXBuildFile; fileRef = 80C8D4D7236B2A3000664FC5 /* RELListRequestDataProcessorProtocol.swift */; };
 		80C8D4F0236B2A3000664FC5 /* RELDataBindableObjectProtocol.swift in Sources */ = {isa = PBXBuildFile; fileRef = 80C8D4D8236B2A3000664FC5 /* RELDataBindableObjectProtocol.swift */; };
 		80C8D4F1236B2A3000664FC5 /* RELEntity.swift in Sources */ = {isa = PBXBuildFile; fileRef = 80C8D4D9236B2A3000664FC5 /* RELEntity.swift */; };
-		80C8D4F2236B2A3000664FC5 /* RXCMessagedError.swift in Sources */ = {isa = PBXBuildFile; fileRef = 80C8D4DA236B2A3000664FC5 /* RXCMessagedError.swift */; };
-		80C8D4F3236B2A3000664FC5 /* RELFirstTimeViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 80C8D4DB236B2A3000664FC5 /* RELFirstTimeViewController.swift */; };
 		80C8D4F4236B2A3000664FC5 /* RXCEntityListViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 80C8D4DC236B2A3000664FC5 /* RXCEntityListViewController.swift */; };
 		80C8D4F7236B2B4400664FC5 /* RELCellSelector.swift in Sources */ = {isa = PBXBuildFile; fileRef = 80C8D4F6236B2B4400664FC5 /* RELCellSelector.swift */; };
+		80F8157A23701AE5001030D9 /* RELListRequestResponseSpec.swift in Sources */ = {isa = PBXBuildFile; fileRef = 80F8157923701AE5001030D9 /* RELListRequestResponseSpec.swift */; };
 		B3C0948D41AA97D25547CF44 /* Pods_RXCEntityListViewController.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = E0396CD7D0E052C10A8079C0 /* Pods_RXCEntityListViewController.framework */; };
 /* End PBXBuildFile section */
 
@@ -44,24 +43,21 @@
 		80C8D489236B28F500664FC5 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
 		80C8D4C3236B2A3000664FC5 /* RELCellSelectorManager.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = RELCellSelectorManager.swift; sourceTree = "<group>"; };
 		80C8D4C4236B2A3000664FC5 /* RELCellSelectorPriority.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = RELCellSelectorPriority.swift; sourceTree = "<group>"; };
-		80C8D4C5236B2A3000664FC5 /* RELTableViewCellSelector.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = RELTableViewCellSelector.swift; sourceTree = "<group>"; };
 		80C8D4C6236B2A3000664FC5 /* RELCard.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = RELCard.swift; sourceTree = "<group>"; };
 		80C8D4C9236B2A3000664FC5 /* KARemoteEntityParserV2.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = KARemoteEntityParserV2.swift; sourceTree = "<group>"; };
 		80C8D4CA236B2A3000664FC5 /* ApiRequestErrorV2.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = ApiRequestErrorV2.swift; sourceTree = "<group>"; };
 		80C8D4CB236B2A3000664FC5 /* ApiRequestResultV2.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = ApiRequestResultV2.swift; sourceTree = "<group>"; };
-		80C8D4CC236B2A3000664FC5 /* RXCParserV2.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = RXCParserV2.swift; sourceTree = "<group>"; };
 		80C8D4CD236B2A3000664FC5 /* AlamofireRequest+CoolApk.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = "AlamofireRequest+CoolApk.swift"; sourceTree = "<group>"; };
 		80C8D4CE236B2A3000664FC5 /* APIServiceV2.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = APIServiceV2.swift; sourceTree = "<group>"; };
 		80C8D4CF236B2A3000664FC5 /* RXCGenericRemoteEntityParserV2.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = RXCGenericRemoteEntityParserV2.swift; sourceTree = "<group>"; };
 		80C8D4D0236B2A3000664FC5 /* ApiRequestSpecV2.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = ApiRequestSpecV2.swift; sourceTree = "<group>"; };
-		80C8D4D2236B2A3000664FC5 /* EntityListRequestSpecV2.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = EntityListRequestSpecV2.swift; sourceTree = "<group>"; };
+		80C8D4D2236B2A3000664FC5 /* RELEntityListRequestSpec.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = RELEntityListRequestSpec.swift; sourceTree = "<group>"; };
 		80C8D4D7236B2A3000664FC5 /* RELListRequestDataProcessorProtocol.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = RELListRequestDataProcessorProtocol.swift; sourceTree = "<group>"; };
 		80C8D4D8236B2A3000664FC5 /* RELDataBindableObjectProtocol.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = RELDataBindableObjectProtocol.swift; sourceTree = "<group>"; };
 		80C8D4D9236B2A3000664FC5 /* RELEntity.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = RELEntity.swift; sourceTree = "<group>"; };
-		80C8D4DA236B2A3000664FC5 /* RXCMessagedError.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = RXCMessagedError.swift; sourceTree = "<group>"; };
-		80C8D4DB236B2A3000664FC5 /* RELFirstTimeViewController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = RELFirstTimeViewController.swift; sourceTree = "<group>"; };
 		80C8D4DC236B2A3000664FC5 /* RXCEntityListViewController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = RXCEntityListViewController.swift; sourceTree = "<group>"; };
 		80C8D4F6236B2B4400664FC5 /* RELCellSelector.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RELCellSelector.swift; sourceTree = "<group>"; };
+		80F8157923701AE5001030D9 /* RELListRequestResponseSpec.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RELListRequestResponseSpec.swift; sourceTree = "<group>"; };
 		9112AC01BB12C36F12CD3929 /* Pods-RXCEntityListViewController.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-RXCEntityListViewController.debug.xcconfig"; path = "Target Support Files/Pods-RXCEntityListViewController/Pods-RXCEntityListViewController.debug.xcconfig"; sourceTree = "<group>"; };
 		E0396CD7D0E052C10A8079C0 /* Pods_RXCEntityListViewController.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = Pods_RXCEntityListViewController.framework; sourceTree = BUILT_PRODUCTS_DIR; };
 /* End PBXFileReference section */
@@ -140,10 +136,9 @@
 				80C8D4F5236B2A3600664FC5 /* Model */,
 				80C8D4C8236B2A3000664FC5 /* APIRequestSystem */,
 				80C8D4C2236B2A3000664FC5 /* CellSelectorManager */,
-				80C8D4D2236B2A3000664FC5 /* EntityListRequestSpecV2.swift */,
 				80C8D4D3236B2A3000664FC5 /* Protocol */,
-				80C8D4DA236B2A3000664FC5 /* RXCMessagedError.swift */,
-				80C8D4DB236B2A3000664FC5 /* RELFirstTimeViewController.swift */,
+				80C8D4D2236B2A3000664FC5 /* RELEntityListRequestSpec.swift */,
+				80F8157923701AE5001030D9 /* RELListRequestResponseSpec.swift */,
 				80C8D4DC236B2A3000664FC5 /* RXCEntityListViewController.swift */,
 			);
 			path = Source;
@@ -154,7 +149,6 @@
 			children = (
 				80C8D4C3236B2A3000664FC5 /* RELCellSelectorManager.swift */,
 				80C8D4C4236B2A3000664FC5 /* RELCellSelectorPriority.swift */,
-				80C8D4C5236B2A3000664FC5 /* RELTableViewCellSelector.swift */,
 				80C8D4F6236B2B4400664FC5 /* RELCellSelector.swift */,
 			);
 			path = CellSelectorManager;
@@ -166,7 +160,6 @@
 				80C8D4C9236B2A3000664FC5 /* KARemoteEntityParserV2.swift */,
 				80C8D4CA236B2A3000664FC5 /* ApiRequestErrorV2.swift */,
 				80C8D4CB236B2A3000664FC5 /* ApiRequestResultV2.swift */,
-				80C8D4CC236B2A3000664FC5 /* RXCParserV2.swift */,
 				80C8D4CD236B2A3000664FC5 /* AlamofireRequest+CoolApk.swift */,
 				80C8D4CE236B2A3000664FC5 /* APIServiceV2.swift */,
 				80C8D4CF236B2A3000664FC5 /* RXCGenericRemoteEntityParserV2.swift */,
@@ -362,13 +355,12 @@
 			files = (
 				80C8D4DE236B2A3000664FC5 /* RELCellSelectorPriority.swift in Sources */,
 				80C8D4F4236B2A3000664FC5 /* RXCEntityListViewController.swift in Sources */,
-				80C8D4F3236B2A3000664FC5 /* RELFirstTimeViewController.swift in Sources */,
 				80C8D4E0236B2A3000664FC5 /* RELCard.swift in Sources */,
-				80C8D4EB236B2A3000664FC5 /* EntityListRequestSpecV2.swift in Sources */,
+				80C8D4EB236B2A3000664FC5 /* RELEntityListRequestSpec.swift in Sources */,
 				80C8D4DD236B2A3000664FC5 /* RELCellSelectorManager.swift in Sources */,
+				80F8157A23701AE5001030D9 /* RELListRequestResponseSpec.swift in Sources */,
 				80C8D4EF236B2A3000664FC5 /* RELListRequestDataProcessorProtocol.swift in Sources */,
 				80C8D4F0236B2A3000664FC5 /* RELDataBindableObjectProtocol.swift in Sources */,
-				80C8D4F2236B2A3000664FC5 /* RXCMessagedError.swift in Sources */,
 				80C8D4F1236B2A3000664FC5 /* RELEntity.swift in Sources */,
 				80C8D4F7236B2B4400664FC5 /* RELCellSelector.swift in Sources */,
 			);
