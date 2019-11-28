@@ -26,6 +26,7 @@ public class RELCellSelectorManager {
     }
 
     internal let readWriteQueue:DispatchQueue = DispatchQueue.init(label: "readWriteQueue", qos: .default, attributes: .concurrent)
+    internal let readWriteQueueGroup:DispatchGroup = DispatchGroup()
 
     ///higher priority to lower priority
     public var prioritySelectorPairs:[PrioritySelectorPair] = []
@@ -36,21 +37,22 @@ public class RELCellSelectorManager {
         }
     }
 
-    internal func safeWrite(closure:@escaping()->Void) {
-        let g = DispatchGroup()
-        self.readWriteQueue.async(group: g, qos: .default, flags: .barrier) {
-            closure()
+    internal func safeWrite(wait:Bool=true, closure:@escaping()->Void) {
+        self.readWriteQueue.async(group: self.readWriteQueueGroup, qos: .default, flags: .barrier, execute: closure)
+        if wait {
+            self.readWriteQueueGroup.wait()
         }
-        g.wait()
     }
 
     ///返回某个优先级的全部选择器
     internal func selectors(for priority:Priority)->[RELCellSelector]? {
+        //无需safe
         return self.prioritySelectorPairs.filter({$0.priority==priority}).first?.selectors
     }
 
     ///为某个优先级设置选择器
     internal func setSelectors(for priority:Priority, selectors:[RELCellSelector]) {
+        //无需safe
         let pair = PrioritySelectorPair(priority: priority)
         pair.selectors = selectors
         if let index = self.prioritySelectorPairs.firstIndex(where: {$0.priority == priority}) {
@@ -98,16 +100,20 @@ extension RELCellSelectorManager {
 extension RELCellSelectorManager {
     ///retrive a selector, private function
     public func selector(for object:Any?, indexPath:IndexPath?=nil, includeDefault:Bool=true)->RELCellSelector? {
-        for pair in self.prioritySelectorPairs {
-            if !includeDefault && pair.priority.value == Priority.ValueType.min {continue}
-            let selectors = pair.selectors
-            for j in selectors {
-                if j.isMatched(object: object) {
-                    return j
+        var selector:RELCellSelector?
+        self.safeRead {
+            for pair in self.prioritySelectorPairs {
+                if !includeDefault && pair.priority.value == Priority.ValueType.min {continue}
+                let selectors = pair.selectors
+                for j in selectors {
+                    if j.isMatched(object: object) {
+                        selector = j
+                        return
+                    }
                 }
             }
         }
-        return nil
+        return selector
     }
 
     ///公共的取回Cell的方法
@@ -215,6 +221,7 @@ extension RELCellSelectorManager {
 public extension RELCellSelectorManager {
 
     ///register cells for a list view if the selector is in register mode
+    ///将当前所有的selector中需要进行注册的注册到listView中
     func listViewRegistering(listView: AnyObject) {
         for pair in self.prioritySelectorPairs.reversed() {
             for selector in pair.selectors.reversed() {

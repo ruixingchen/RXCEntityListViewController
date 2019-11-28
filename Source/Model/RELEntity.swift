@@ -11,17 +11,12 @@ import Foundation
 import RXCDiffArray
 #endif
 
-///表示一个
-public protocol RELEntityProtocol {
-
-}
-
 #if canImport(RXCDiffArray)
-public protocol RELRowEntityProtocol: RELEntityProtocol, RDADiffableRowElementProtocol {
+public protocol RELRowEntityProtocol: RDADiffableRowElementProtocol {
 
 }
 #else
-public protocol RELRowEntityProtocol: RELEntityProtocol {
+public protocol RELRowEntityProtocol {
 
 }
 #endif

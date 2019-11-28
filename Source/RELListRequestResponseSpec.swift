@@ -11,21 +11,27 @@ import Foundation
 ///列表页请求回复的抽象
 open class RELListRequestResponseSpec<T> {
 
-    open var data:Data?
-    open var response:URLResponse?
+    open var data:T?
+    ///response对象,例如URLResponse
+    open var response:Any?
     open var error:Error?
 
-    open var result:Swift.Result<T, Error>
-
-    public init(data:Data, response:URLResponse?, error:Error?, result: Swift.Result<T, Error>) {
+    public init(data:T?, response:URLResponse?, error:Error?) {
         self.data = data
         self.response = response
         self.error = error
-        self.result = result
+    }
+
+    open var result:Swift.Result<T?, Error> {
+        if let e = self.error {
+            return .failure(e)
+        }else {
+            return .success(self.data)
+        }
     }
 
     open var isSuccess:Bool {
-        return (try? self.result.get()) != nil
+        return self.error == nil
     }
 
 }

@@ -69,6 +69,7 @@ PODS:
     - Texture/Core
 
 DEPENDENCIES:
+  - Alamofire
   - RXCDiffArray (from `../RXCDiffArray`)
   - RXCDiffArray/ASDKExtension (from `../RXCDiffArray`)
   - RXCDiffArray/DifferenceKit (from `../RXCDiffArray`)
@@ -118,6 +119,6 @@ SPEC CHECKSUMS:
   RXCSwiftComponents: fa8e140f92d37b8b07365f230044c1601084cbfd
   Texture: 8ecf6984065a1e54f06bf97b349ecca28582acd7
 
-PODFILE CHECKSUM: 78036ab55b4c3fdf94ffde187ef600f2db24ecd7
+PODFILE CHECKSUM: e1b2626cc2aefc19fb29241805548ab85ed11492
 
 COCOAPODS: 1.8.4

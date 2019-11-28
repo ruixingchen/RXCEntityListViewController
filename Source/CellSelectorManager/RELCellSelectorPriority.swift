@@ -9,6 +9,10 @@
 import Foundation
 
 public struct RELCellSelectorPriority: ExpressibleByIntegerLiteral, Strideable, Equatable, Comparable {
+
+    public typealias ValueType = Int16
+    public typealias Stride = Int16
+    public typealias IntegerLiteralType = Int16
     
     public static func < (lhs: RELCellSelectorPriority, rhs: RELCellSelectorPriority) -> Bool {
         return lhs.value < rhs.value
@@ -49,10 +53,6 @@ public struct RELCellSelectorPriority: ExpressibleByIntegerLiteral, Strideable, 
     public static var min: RELCellSelectorPriority {
         return RELCellSelectorPriority(ValueType.min)
     }
-
-    public typealias ValueType = UInt16
-    public typealias Stride = UInt16
-    public typealias IntegerLiteralType = UInt16
 
     public let value: ValueType
 

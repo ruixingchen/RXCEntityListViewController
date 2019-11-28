@@ -28,6 +28,9 @@ import RXCFirstTimeViewController
 #if canImport(RXCLoadingStateManager)
 import RXCLoadingStateManager
 #endif
+#if canImport(Alamofire)
+import Alamofire
+#endif
 
 #if !(CanUseASDK || canImport(AsyncDisplayKit))
 private protocol ASTableDataSource {
@@ -43,8 +46,12 @@ private protocol ASCollectionDelegate {
 }
 #endif
 
+
+
 public extension RXCEntityListViewController {
 
+    /*
+     所有的页面应该强制使用二维结构, 统一管理
     ///页面的结构
     enum ListStructure {
         ///one entity for one row, just 1 section
@@ -54,14 +61,20 @@ public extension RXCEntityListViewController {
         ///2D structure, the root element must be a card
         case cardForSection
     }
+     */
 
+    /*
+     //默认头部
     ///头部刷新的数据合并模式
     enum HeaderRefreshMode {
         ///new data will be inserted at the head
+        ///头部刷新的数据将会被插入在列表的头部, 默认值
         case insert
         ///will reload all content, set page to 1
+        //每次头部刷新的数据将会替换当前的数据
         case reload
     }
+     */
 
     enum ListRequestType {
         ///头部刷新请求
@@ -72,16 +85,24 @@ public extension RXCEntityListViewController {
 
 }
 
+internal func rellog(_ closure:@autoclosure ()->Any, file:StaticString = #file,line:Int = #line,function:StaticString = #function) {
+    if RXCEntityListViewController.debugMode {
+        let fileName = String(describing: file).components(separatedBy: "/").last ?? ""
+        print("-----\(fileName):\(line) - \(function) :\n \(closure())")
+    }
+}
+
 /*
 通用界面的思路描述：
  关于数据请求：页面第一次将要显示的时候，进行初始化请求，默认的初始化请求是一个底部刷新行为，接收到请求后，进入数据处理，数据合并，更新UI，请求结束几个流程，下面是对几个流程的工作内容描述：
     数据处理阶段：服务器数据会有一些配置型的数据混在返回数据中，通过processor来处理数据
-    数据合并：   将上一步生成的两份数据合并到本地的数据源中
-    更新UI：    在处理数据之前，记录下本地数据的状态，之后将新数据和旧数据做对比，根据Diff结果更新UI
-
+    数据合并：   先将本地数据生成一份副本保存, 将上一步生成的两份数据合并到本地的数据源中
+    更新UI：    将上一步保存的副本和合并后的数据进行对比, 获取diff结果, 根据diff结果来更新本地的UI, 这个操作应该在safeWrite方法中进行
  */
 
-open class RXCEntityListViewController: RXCFirstTimeViewController, ASTableDataSource, ASTableDelegate, ASCollectionDataSource, ASCollectionDelegate, UITableViewDataSource, UITableViewDelegate, UICollectionViewDataSource, UICollectionViewDelegate, RXCDiffArrayDelegate {
+open class RXCEntityListViewController: UIViewController, ASTableDataSource, ASTableDelegate, ASCollectionDataSource, ASCollectionDelegate, UITableViewDataSource, UITableViewDelegate, UICollectionViewDataSource, UICollectionViewDelegate, RXCDiffArrayDelegate {
+    
+    public static var debugMode:Bool = false
 
     public typealias SectionELement = RELSectionCardProtocolWrapper
     public typealias RowElement = RELRowEntityProtocolWrapper
@@ -151,15 +172,16 @@ open class RXCEntityListViewController: RXCFirstTimeViewController, ASTableDataS
 
     //MARK: - 数据 / Data
 
-    ///专门用来操作数据源的queue, 所有对数据源的操作都必须在这个queue里面
+    ///专门用来操作数据源的queue, 所有对数据源的操作都必须在这个queue里面执行
     open lazy var dataListOperationQueue:DispatchQueue = DispatchQueue.init(label: "dataListOperationQueue", qos: .default, attributes: .concurrent)
+    open lazy var dataListOperatingGroup:DispatchGroup = DispatchGroup()
 
     internal var _localDataList:DataList?
     open var localDataList: DataList {
         if self._localDataList == nil {
             self._localDataList = self.initDataList()
         }
-        return self.localDataList
+        return self._localDataList!
     }
 
     ///安全地读取数据源, 所有的读取操作都必须在这里执行
@@ -168,10 +190,11 @@ open class RXCEntityListViewController: RXCFirstTimeViewController, ASTableDataS
     }
 
     ///安全地操作本地数据源, 所有的修改操作都必须在这里执行
-    open func safeOperatingDataList(closure:@escaping()->Void) {
-        let g = DispatchGroup()
-        self.dataListOperationQueue.async(group: g, qos: .default, flags: .barrier, execute: closure)
-        g.wait()
+    open func safeWriteDataList(wait:Bool=true, closure:@escaping()->Void) {
+        self.dataListOperationQueue.async(group: self.dataListOperatingGroup, qos: .default, flags: .barrier, execute: closure)
+        if wait {
+            self.dataListOperatingGroup.wait()
+        }
     }
 
     internal var _dataProcessors: [RELListRequestDataProcessorProtocol]?
@@ -201,10 +224,10 @@ open class RXCEntityListViewController: RXCFirstTimeViewController, ASTableDataS
     //MARK: - 请求相关
 
     ///头部请求的请求对象,只要不为空我们就认为请求正在进行, 请求完毕后应该将本对象置空
-    open var headerRequest: ListRequestTask?
+    open var headerRequestTask: ListRequestTask?
 
     ///底部请求的请求对象,只要不为空我们就认为请求正在进行, 请求完毕后应该将本对象置空
-    open var footerRequest: ListRequestTask?
+    open var footerRequestTask: ListRequestTask?
 
     ///列表是否还有更多内容
     open var hasMoreData: Bool = true
@@ -326,12 +349,6 @@ open class RXCEntityListViewController: RXCFirstTimeViewController, ASTableDataS
 
     }
 
-    open override func rxc_viewWillAppear_first(_ animated: Bool) {
-        super.rxc_viewWillAppear_first(animated)
-        //第一次出现的时候请求数据, 子类自己重写后来决定什么时候发起请求
-        //self.startInitRequest()
-    }
-
     open override func viewWillLayoutSubviews() {
         super.viewWillLayoutSubviews()
         self.layoutListView()
@@ -358,7 +375,7 @@ open class RXCEntityListViewController: RXCFirstTimeViewController, ASTableDataS
     //MARK: - 操作 ListView
 
     ///安装顶部刷新控件
-    open func installHeaderRefreshComponent() {
+    open func installHeaderRefreshComponentIfNeeded() {
         //默认安装系统的刷新组件
         guard self.headerRefreshComponent == nil else {
             return
@@ -402,7 +419,7 @@ open class RXCEntityListViewController: RXCFirstTimeViewController, ASTableDataS
     }
 
     ///安装底部刷新控件
-    open func installFooterRefreshComponent() {
+    open func installFooterRefreshComponentIfNeeded() {
         #if canImport(AsyncDisplayKit)
         if self.useASDK {
             self.footerRefreshComponent = NSObject()
@@ -416,6 +433,9 @@ open class RXCEntityListViewController: RXCFirstTimeViewController, ASTableDataS
     open func uninstallFooterRefreshComponent() {
         #if canImport(AsyncDisplayKit)
         if self.useASDK {
+            if let context = self.footerRefreshComponent as? ASBatchContext {
+                context.cancelBatchFetching()
+            }
             self.footerRefreshComponent = nil
             return
         }
@@ -578,20 +598,36 @@ open class RXCEntityListViewController: RXCFirstTimeViewController, ASTableDataS
     }
 
     public func shouldBatchFetch(for tableNode: ASTableNode) -> Bool {
-        return self.canTakeFooterRefreshRequest()
+        ///必须确保当前安装了底部刷新控件才可以
+        return self.canTakeFooterRefreshRequest() && self.footerRefreshComponent != nil
     }
 
     public func shouldBatchFetch(for collectionNode: ASCollectionNode) -> Bool {
-        return self.canTakeFooterRefreshRequest()
+        return self.canTakeFooterRefreshRequest() && self.footerRefreshComponent != nil
     }
 
     public func tableNode(_ tableNode: ASTableNode, willBeginBatchFetchWith context: ASBatchContext) {
-        //开始底部请求
-
+        //这个方法能被执行表示canTakeFooterRefreshRequest一定返回了true, 但是我们在这里还是要再确定一下
+        if !self.canTakeFooterRefreshRequest() {
+            context.cancelBatchFetching()
+        }else {
+            //开始请求
+            rellog("ASDK开始进行 BatchFetch")
+            self.footerRefreshComponent = context
+            self.footerRefreshAction(sender: context)
+        }
     }
 
     public func collectionNode(_ collectionNode: ASCollectionNode, willBeginBatchFetchWith context: ASBatchContext) {
-
+        //这个方法能被执行表示canTakeFooterRefreshRequest一定返回了true, 但是我们在这里还是要再确定一下
+        if !self.canTakeFooterRefreshRequest() {
+            context.cancelBatchFetching()
+        }else {
+            //开始请求
+            rellog("ASDK开始进行 BatchFetch")
+            self.footerRefreshComponent = context
+            self.footerRefreshAction(sender: context)
+        }
     }
 
     #endif
@@ -602,10 +638,12 @@ open class RXCEntityListViewController: RXCFirstTimeViewController, ASTableDataS
 
     open func diffArray<ElementContainer>(diffArray: RXCDiffArray<ElementContainer>, didModifiedWith differences: [RDADifference<ElementContainer>]) where ElementContainer : RangeReplaceableCollection {
 
+        rellog("接收到 diffArray 变化通知, 开始更新UI")
+
         if let __tableView = self.listViewObject as? UITableView {
             for i in differences {
                 __tableView.reload(with: i, animations: .none(), reloadDataSource: { (newData) in
-                    self.safeOperatingDataList {
+                    self.safeWriteDataList(wait: true) {
                         self.localDataList.removeAll(userInfo: [DataList.Key.notify as AnyHashable: false], where: {_ in true})
                         self.localDataList.add(contentsOf: newData as! [SectionELement], userInfo: [DataList.Key.notify: false])
                     }
@@ -616,7 +654,7 @@ open class RXCEntityListViewController: RXCFirstTimeViewController, ASTableDataS
         }else if let __collectionView = self.listViewObject as? UICollectionView {
             for i in differences {
                 __collectionView.reload(with: i, animations: .none(), reloadDataSource: { (newData) in
-                    self.safeOperatingDataList {
+                    self.safeWriteDataList(wait: true) {
                         self.localDataList.removeAll(userInfo: [DataList.Key.notify as AnyHashable: false], where: {_ in true})
                         self.localDataList.add(contentsOf: newData as! [SectionELement], userInfo: [DataList.Key.notify: false])
                     }
@@ -643,7 +681,7 @@ open class RXCEntityListViewController: RXCFirstTimeViewController, ASTableDataS
             if let __tableNode = self.listViewObject as? ASTableNode {
                 for i in differences {
                     __tableNode.reload(with: i, animations: .none(), reloadDataSource: { (newData) in
-                        self.safeOperatingDataList {
+                        self.safeWriteDataList(wait: true) {
                             self.localDataList.removeAll(userInfo: [DataList.Key.notify as AnyHashable: false], where: {_ in true})
                             self.localDataList.add(contentsOf: newData as! [SectionELement], userInfo: [DataList.Key.notify: false])
                         }
@@ -654,7 +692,7 @@ open class RXCEntityListViewController: RXCFirstTimeViewController, ASTableDataS
             }else if let __collectionNode = self.listViewObject as? ASCollectionNode {
                 for i in differences {
                     __collectionNode.reload(with: i, animations: .none(), reloadDataSource: { (newData) in
-                        self.safeOperatingDataList {
+                        self.safeWriteDataList(wait: true) {
                             self.localDataList.removeAll(userInfo: [DataList.Key.notify as AnyHashable: false], where: {_ in true})
                             self.localDataList.add(contentsOf: newData as! [SectionELement], userInfo: [DataList.Key.notify: false])
                         }
@@ -669,26 +707,54 @@ open class RXCEntityListViewController: RXCFirstTimeViewController, ASTableDataS
 
     //MARK: - 请求状态
 
+    ///当前是否正在进行头部请求
     open func isHeaderRequesting() -> Bool {
-        return self.headerRequest != nil
+        return self.headerRequestTask != nil
     }
 
+    ///当前是否正在进行底部请求
     open func isFooterRequesting() -> Bool {
-        return self.footerRequest != nil
+        return self.footerRequestTask != nil
     }
 
+    ///取消头部刷新
     open func cancelHeaderRefreshRequest() {
-        if let req = self.headerRequest as? URLSessionTask {
+        guard self.headerRequestTask != nil else {return}
+        rellog("取消头部刷新请求")
+        self.stopHeaderRefreshComponent(userInfo: nil)
+        if let req = self.headerRequestTask as? URLSessionTask {
             req.cancel()
+            self.headerRequestTask = nil
             return
+        }else {
+            #if canImport(Alamofire)
+            if let request = self.headerRequestTask as? Alamofire.Request {
+                request.cancel()
+                self.headerRequestTask = nil
+                return
+            }
+            #endif
         }
         fatalError("子类需要重写来实现功能")
     }
 
+    ///取消底部刷新
     open func cancelFooterRefreshRequest() {
-        if let req = self.footerRequest as? URLSessionTask {
+        guard self.footerRequestTask != nil else {return}
+        rellog("取消底部刷新请求")
+        self.stopFooterRefreshComponent(hasMoreData: self.hasMoreData, userInfo: nil)
+        if let req = self.footerRequestTask as? URLSessionTask {
             req.cancel()
+            self.footerRequestTask = nil
             return
+        }else {
+            #if canImport(Alamofire)
+            if let request = self.footerRequestTask as? Alamofire.Request {
+                request.cancel()
+                self.footerRequestTask = nil
+                return
+            }
+            #endif
         }
         fatalError("子类需要重写来实现功能")
     }
@@ -696,10 +762,14 @@ open class RXCEntityListViewController: RXCFirstTimeViewController, ASTableDataS
     ///此时是否可以发起头部刷新请求
     open func canTakeHeaderRefreshRequest() -> Bool {
         //一般情况下, 头部刷新优先级高于底部刷新, 头部刷新进行的时候, 直接取消底部刷新
+        if self.isHeaderRequesting() {
+            //已经在刷新了
+            return false
+        }
         return true
     }
 
-    ///此时是否可以发起底部刷新请求
+    ///此时是否可以发起底部刷新请求, 一般是要求列表还有数据 + 头部不处于请求状态
     open func canTakeFooterRefreshRequest() -> Bool {
         if self.isHeaderRequesting() {
             return false
@@ -710,35 +780,46 @@ open class RXCEntityListViewController: RXCFirstTimeViewController, ASTableDataS
         return true
     }
 
-    ///结束一个头部刷新, 典型操作是结束刷新控件的刷新
+    ///结束一个头部刷新, 典型操作是结束刷新控件的刷新后将headerRequest置空
     open func endHeaderRefresh(userInfo:[AnyHashable:Any]?) {
+        rellog("结束头部刷新")
         self.stopHeaderRefreshComponent(userInfo: userInfo)
-        self.headerRequest = nil
+        self.headerRequestTask = nil
     }
 
-    ///结束一个底部刷新, 典型操作是结束刷新控件的刷新
+    ///结束一个底部刷新, 典型操作是结束刷新控件的刷新, 将footerRequest置空
     open func endFooterRefresh(hasMoreData:Bool, userInfo:[AnyHashable:Any]?) {
+        rellog("结束底部刷新")
         self.stopFooterRefreshComponent(hasMoreData: hasMoreData, userInfo: userInfo)
         self.hasMoreData = hasMoreData
-        self.footerRequest = nil
+        self.footerRequestTask = nil
     }
 
     //MARK: - 请求逻辑
 
-    ///这个函数可以接收头部刷新控件传来的要求进行刷新的事件
+    ///头部刷新事件入口, 调用前需要先判断当前是否可以进行对应的请求
     @objc open func headerRefreshAction(sender: Any?) {
+        rellog("头部刷新启动")
         //当执行头部刷新的时候, 先取消底部刷新, 防止干扰
-        guard self.canTakeHeaderRefreshRequest() else {
-            return
-        }
+        assert(self.canTakeFooterRefreshRequest(), "不可以发起头部请求的情况下调用了headerRefreshAction")
         self.cancelFooterRefreshRequest()
+        let spec = self.listRequestSpec(requestType: .headerRefresh, page: 1, userInfo: nil)
+        let task = self.startListRequest(requestSpec: spec, userInfo: nil)
+        self.headerRequestTask = task
     }
 
-
+    ///底部刷新事件入口, 调用前需要先判断当前是否可以进行对应的请求
+    @objc open func footerRefreshAction(sender:Any?) {
+        rellog("底部刷新启动")
+        assert(self.canTakeFooterRefreshRequest(), "不可以发起底部请求的情况下调用了footerRefreshAction")
+        let spec = self.listRequestSpec(requestType: .footerRefresh, page: self.page+1, userInfo: nil)
+        self.startListRequest(requestSpec: spec, userInfo: nil)
+    }
 
     ///开始前置请求, 有些界面需要有前置请求, 根据前置请求的结果来决定列表页的接口
     ///默认没有前置请求, 直接调用底部刷新接口
     open func startInitRequest() {
+        rellog("开始初始化请求")
         //请求完毕后安装底部刷新控件, 之后就能正常启用列表请求的逻辑
         //默认没有前置请求，直接判断为前置请求完成
         //如果需要前置请求, 可以重写后进行请求, 请求完毕之后, 设置头尾的刷新控件即可
@@ -751,9 +832,9 @@ open class RXCEntityListViewController: RXCFirstTimeViewController, ASTableDataS
                 self.loadingStateManager?.finishLoading(success: false)
             }else {
                 //合并数据
-                self.safeOperatingDataList {
+                self.safeWriteDataList {
                     var diff:[DataList.Difference]!
-                    self.safeOperatingDataList {
+                    self.safeWriteDataList {
                         diff = self.localDataList.batchWithDifferenceKit_2D {
                             //在这里插入数据
                         }
@@ -761,8 +842,8 @@ open class RXCEntityListViewController: RXCFirstTimeViewController, ASTableDataS
                     self.diffArray(diffArray: self.localDataList, didModifiedWith: diff)
                 }
                 self.loadingStateManager?.finishLoading(success: true)
-                self.installHeaderRefreshComponent()
-                self.installFooterRefreshComponent()
+                self.installHeaderRefreshComponentIfNeeded()
+                self.installFooterRefreshComponentIfNeeded()
             }
         }
         task.resume()
@@ -803,6 +884,20 @@ open class RXCEntityListViewController: RXCFirstTimeViewController, ASTableDataS
          */
     }
 
+    ///这个请求失败是不是被取消引起的, 如果一个请求被取消了, 那么在回调中应该直接结束请求, 不可以操作任何UI
+    open func isRequestFailedWithCalcelled(requestSpec: ListRequestSpec, response: ListRequestResponse, userInfo: [AnyHashable: Any]?)->Bool {
+
+        guard let error = response.error else {
+            return false
+        }
+        let code = (error as NSError).code
+        let domain = (error as NSError).domain
+        if domain == URLError.errorDomain && code == URLError.cancelled.rawValue {
+            return true
+        }
+        return false
+    }
+
     ///数据合并的时候, 新的数据应该合并到哪个section中? 默认是0
     ///有时候我们需要在第0节显示占位信息, 这里就可以强制让新数据插入到其他节中了
     open func listRequestDataMergeSection(requestSpec: ListRequestSpec, response: ListRequestResponse)->Int {
@@ -810,7 +905,9 @@ open class RXCEntityListViewController: RXCFirstTimeViewController, ASTableDataS
     }
 
     //开始请求
-    open func startListRequest(requestSpec: ListRequestSpec, userInfo: [AnyHashable: Any]?) {
+    @discardableResult
+    open func startListRequest(requestSpec: ListRequestSpec, userInfo: [AnyHashable: Any]?)->ListRequestTask {
+        rellog("开始列表页请求: \(requestSpec.page), \(requestSpec.requestType), \(requestSpec.url)")
         //默认请求到的数据是一个数组, 至于数组内部的对象则根据请求接口不一样而不一样
         fatalError("子类必须重写来实现请求")
         //下面是example
@@ -825,8 +922,11 @@ open class RXCEntityListViewController: RXCFirstTimeViewController, ASTableDataS
 //        }
     }
 
+    //MARK: - 请求回应流程
+
     ///请求接收到回应
     open func onListRequestResponse(requestSpec: ListRequestSpec, response: ListRequestResponse, userInfo: [AnyHashable: Any]?) {
+        rellog("列表请求回应:\(requestSpec.page) \(requestSpec.requestType), 成功:\(response.isSuccess)")
         ///接收到服务器的回应后，根据回应进入不同的处理分支
         if !response.isSuccess {
             //请求失败分支
@@ -839,6 +939,11 @@ open class RXCEntityListViewController: RXCFirstTimeViewController, ASTableDataS
 
     ///请求没有正确完成，任何错误都会进入本流程
     open func onListRequestResponseError(requestSpec: ListRequestSpec, response: ListRequestResponse, userInfo: [AnyHashable: Any]?) {
+        rellog("列表请求失败:\(response.error?.localizedDescription ?? "_nil")")
+        if self.isRequestFailedWithCalcelled(requestSpec: requestSpec, response: response, userInfo: userInfo) {
+            //请求被取消的时候不做任何处理
+            return
+        }
         fatalError("本方法应由子类提供实现")
         //下面是example
         /*
@@ -860,15 +965,12 @@ open class RXCEntityListViewController: RXCFirstTimeViewController, ASTableDataS
 
     ///列表请求成功, 执行
     open func onListRequestSuccess(requestSpec: ListRequestSpec, response: ListRequestResponse, userInfo: [AnyHashable: Any]?) {
+        rellog("列表请求成功")
         //这里可以采用两种方案，一种是利用DiffArray的batch方法，将修改包括在一个closure中，之后DiffArray可以自动计算并且返回差异
         //另一种是手动记录当前的状态，之后直接调用后续阶段的方法，等数据处理合并阶段完成后，再计算差异
         //目前选择第二种方法, 逻辑要清楚一些
-        objc_sync_enter(self.localDataList)
+        objc_sync_enter(self)
         let oldData = self.localDataList.toArray()
-
-        let animated = userInfo?["animated"] as? Bool ?? true
-        let enabledSave = UIView.areAnimationsEnabled
-        UIView.setAnimationsEnabled(animated)
 
         //注意, 数据处理内部如果要操作本地列表数据, 一定要禁用DataList的通知，只操作数据不操作ListView的UI部分
 
@@ -881,8 +983,7 @@ open class RXCEntityListViewController: RXCFirstTimeViewController, ASTableDataS
         //更新UI
         self.onListRequestUpdateListView(differences: diffs, requestSpec: requestSpec, response: response, userInfo: userInfo, completion: nil)
 
-        UIView.setAnimationsEnabled(enabledSave)
-        objc_sync_exit(self.localDataList)
+        objc_sync_exit(self)
 
         //请求结束
         self.onListRequestEnd(requestSpec: requestSpec, response: response, userInfo: userInfo)
@@ -891,7 +992,8 @@ open class RXCEntityListViewController: RXCFirstTimeViewController, ASTableDataS
     /// 数据处理第一阶段阶段, 这个阶段将对服务器传来的数据进行过滤和处理, 同时也可能会对现有列表进行修改, 比如删除重复项
     /// - Parameter response: 服务器传过来的请求
     open func listRequestDataProcessing(requestSpec: ListRequestSpec, response: ListRequestResponse, userInfo: [AnyHashable: Any]?)->[RowElement] {
-        var newDataList:[RowElement] = response.result.value!
+        rellog("开始列表请求数据处理")
+        var newDataList:[RowElement] = try! response.result.get()!
         for i in self.dataProcessors {
             let processed = i.process(newObjects: newDataList, userInfo: userInfo) as? [RowElement]
             assert(processed != nil, "数据处理器返回了不正确的类型")
@@ -902,14 +1004,21 @@ open class RXCEntityListViewController: RXCFirstTimeViewController, ASTableDataS
 
     /// 数据合并阶段, 这个阶段将服务器传来的数据合并到现有的列表中, 这个阶段不应该对上一步传过来的数据做修改
     open func listRequestDataMerge(requestSpec: ListRequestSpec,response: ListRequestResponse, processedNewData:[RowElement], userInfo: [AnyHashable: Any]?) {
+        rellog("开始列表请求数据合并")
         let section = self.listRequestDataMergeSection(requestSpec: requestSpec, response: response)
         var userInfo = userInfo ?? [:]
         userInfo[DataList.Key.notify] = false
 
         switch requestSpec.requestType {
         case .headerRefresh:
-            self.localDataList.insertRow(contentsOf: processedNewData, at: 0, in: section, userInfo: userInfo)
+            self.localDataList.insertRow(contentsOf: processedNewData, at: section, in: section, userInfo: userInfo)
         case .footerRefresh:
+            //这里需要提前检查对应的Section是否存在, 如果不存在, 需要提前插入新的Section来容纳数据
+            if section >= self.localDataList.count {
+                //当前不存在对应的Section, 先插入数据
+                //self.localDataList.add(RELSectionCardProtocolWrapper(card: ))
+                fatalError("数据合并的时新数据要插入的Section不存在")
+            }
             self.localDataList.addRow(contentsOf: processedNewData, in: section, userInfo: userInfo)
         }
 
@@ -917,19 +1026,25 @@ open class RXCEntityListViewController: RXCFirstTimeViewController, ASTableDataS
 
     ///更新UI阶段
     open func onListRequestUpdateListView(differences:[DataList.Difference], requestSpec: ListRequestSpec, response: ListRequestResponse, userInfo: [AnyHashable: Any]?, completion:((Bool)->Void)?) {
+        rellog("列表请求开始更新UI")
         ///根据旧数据和新数据的对比, 计算出差异后应用到ListView上
         self.diffArray(diffArray: self.localDataList, didModifiedWith: differences)
     }
 
+    ///请求结束
     open func onListRequestEnd(requestSpec: ListRequestSpec, response: ListRequestResponse, userInfo: [AnyHashable: Any]?) {
+        rellog("列表请求结束")
         switch requestSpec.requestType {
         case .headerRefresh:
             self.endHeaderRefresh(userInfo: userInfo)
-            self.installHeaderRefreshComponent()
+            self.installHeaderRefreshComponentIfNeeded()
+            self.installFooterRefreshComponentIfNeeded()
         case .footerRefresh:
             let hasmoreData = self.hasMoreDataAfter(requestSpec: requestSpec, response: response, userInfo: userInfo)
             self.endFooterRefresh(hasMoreData: hasmoreData, userInfo: userInfo)
-            self.installFooterRefreshComponent()
+            self.installHeaderRefreshComponentIfNeeded()
+            self.installFooterRefreshComponentIfNeeded()
+            self.page = requestSpec.page
         }
     }
 

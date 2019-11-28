@@ -1,10 +1,12 @@
 PODS:
+  - Alamofire (4.9.1)
   - DifferenceKit (1.1.3):
     - DifferenceKit/Core (= 1.1.3)
     - DifferenceKit/UIKitExtension (= 1.1.3)
   - DifferenceKit/Core (1.1.3)
   - DifferenceKit/UIKitExtension (1.1.3):
     - DifferenceKit/Core
+  - MJRefresh (3.2.3)
   - PINCache (3.0.1-beta.6):
     - PINCache/Arc-exception-safe (= 3.0.1-beta.6)
     - PINCache/Core (= 3.0.1-beta.6)
@@ -32,14 +34,18 @@ PODS:
     - RXCDiffArray/Core
   - RXCDiffArray/UIKitExtension (1.1):
     - RXCDiffArray/Core
-  - RXCEntityListViewController (1.0):
-    - RXCEntityListViewController/Core (= 1.0)
-  - RXCEntityListViewController/Core (1.0):
-    - RXCDiffArray (~> 1.1)
-    - RXCDiffArray/DifferenceKit
-  - RXCEntityListViewController/Texture (1.0):
-    - RXCDiffArray/ASDKExtension (~> 1.1)
-    - RXCEntityListViewController/Core
+  - RXCFirstTimeViewController (1.1)
+  - RXCLoadingStateManager (1.0):
+    - RXCLoadingStateManager/Core (= 1.0)
+  - RXCLoadingStateManager/Core (1.0)
+  - RXCSwiftComponents (1.0):
+    - RXCSwiftComponents/Core (= 1.0)
+  - RXCSwiftComponents/Alamofire (1.0):
+    - Alamofire (~> 4.9)
+  - RXCSwiftComponents/Core (1.0)
+  - RXCSwiftComponents/MJRefresh (1.0):
+    - MJRefresh (~> 3.2)
+  - RXCSwiftComponents/Texture (1.0):
     - Texture (~> 2.8)
   - Texture (2.8.1):
     - Texture/AssetsLibrary (= 2.8.1)
@@ -63,31 +69,52 @@ PODS:
     - Texture/Core
 
 DEPENDENCIES:
-  - RXCEntityListViewController (from `../`)
-  - RXCEntityListViewController/Texture (from `../`)
+  - Alamofire
+  - DifferenceKit
+  - RXCDiffArray (from `../../RXCDiffArray`)
+  - RXCDiffArray/ASDKExtension (from `../../RXCDiffArray`)
+  - RXCDiffArray/DifferenceKit (from `../../RXCDiffArray`)
+  - RXCFirstTimeViewController (from `../../RXCFirstTimeViewController`)
+  - RXCLoadingStateManager (from `../../RXCLoadingStateManager`)
+  - RXCSwiftComponents (from `../../RXCSwiftComponents`)
+  - RXCSwiftComponents/Alamofire (from `../../RXCSwiftComponents`)
+  - RXCSwiftComponents/MJRefresh (from `../../RXCSwiftComponents`)
+  - RXCSwiftComponents/Texture (from `../../RXCSwiftComponents`)
+  - Texture
 
 SPEC REPOS:
   trunk:
+    - Alamofire
     - DifferenceKit
+    - MJRefresh
     - PINCache
     - PINOperation
     - PINRemoteImage
-    - RXCDiffArray
     - Texture
 
 EXTERNAL SOURCES:
-  RXCEntityListViewController:
-    :path: "../"
+  RXCDiffArray:
+    :path: "../../RXCDiffArray"
+  RXCFirstTimeViewController:
+    :path: "../../RXCFirstTimeViewController"
+  RXCLoadingStateManager:
+    :path: "../../RXCLoadingStateManager"
+  RXCSwiftComponents:
+    :path: "../../RXCSwiftComponents"
 
 SPEC CHECKSUMS:
+  Alamofire: 85e8a02c69d6020a0d734f6054870d7ecb75cf18
   DifferenceKit: 5018791b6c1fc839921a3c171a0a539ace6ea60c
+  MJRefresh: 2b1214a2dc8f4df4c5dcb028ea2ad4e245425fb7
   PINCache: d195fdba255283f7e9900a55e3cced377f431f9b
   PINOperation: 24b774353ca248fcf87d67b2d61eef42087c125a
   PINRemoteImage: d6d51c5d2adda55f1ce30c96e850b6c4ebd2856a
   RXCDiffArray: 22ab8acb400b7dedb6208ce2a034892b81494940
-  RXCEntityListViewController: 0112611d8472568e85a7dd3d3f7490a0765bfe9b
+  RXCFirstTimeViewController: 307e181e0fce2e6c60fddcd0994ae319ab4c55c8
+  RXCLoadingStateManager: cc4c057b4e1e017cea75b7298f4df24e2eb8da7b
+  RXCSwiftComponents: fa8e140f92d37b8b07365f230044c1601084cbfd
   Texture: 8ecf6984065a1e54f06bf97b349ecca28582acd7
 
-PODFILE CHECKSUM: 4f07dc9b4d0ad4e63ea7f48873b23b56ee6cd013
+PODFILE CHECKSUM: 71245c19b0c265c3aed4af4060259b28d10e0927
 
 COCOAPODS: 1.8.4

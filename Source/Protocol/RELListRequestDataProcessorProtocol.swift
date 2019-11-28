@@ -17,8 +17,11 @@ public protocol RELListRequestDataProcessorProtocol {
     
 }
 
+/*
+///旧数据处理器协议, 描述一个可以对列表中已经存在的数据进行处理的
 public protocol RELListRequestOldDataProcessorProtocol {
 
     func process(oldData:RXCDiffArray<[Any]>, newData:[Any])
 
 }
+*/

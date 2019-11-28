@@ -11,19 +11,18 @@ import Foundation
 import RXCDiffArray
 #endif
 
-public protocol RELCardProtocol: RELEntityProtocol {
+#if canImport(RXCDiffArray)
+public protocol RELSectionCardProtocol: RDADiffableSectionElementProtocol {
 
     ///不采用范型, 这里直接采用Any, 后面自己做cast
     var rel_cardObjects:[Any]? {get set}
 
 }
-
-#if canImport(RXCDiffArray)
-public protocol RELSectionCardProtocol: RELCardProtocol, RDADiffableSectionElementProtocol {
-
-}
 #else
-public protocol RELSectionCardProtocol: RELCardProtocol {
+public protocol RELSectionCardProtocol {
+
+    ///不采用范型, 这里直接采用Any, 后面自己做cast
+    var rel_cardObjects:[Any]? {get set}
 
 }
 #endif

@@ -3,17 +3,26 @@
 	archiveVersion = 1;
 	classes = {
 	};
-	objectVersion = 50;
+	objectVersion = 51;
 	objects = {
 
 /* Begin PBXBuildFile section */
+		807198B2238F9EC90050591F /* ViewController2.swift in Sources */ = {isa = PBXBuildFile; fileRef = 807198B1238F9EC90050591F /* ViewController2.swift */; };
 		80C8D4A0236B291E00664FC5 /* AppDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = 80C8D49F236B291E00664FC5 /* AppDelegate.swift */; };
-		80C8D4A2236B291E00664FC5 /* SceneDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = 80C8D4A1236B291E00664FC5 /* SceneDelegate.swift */; };
 		80C8D4A4236B291E00664FC5 /* ViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 80C8D4A3236B291E00664FC5 /* ViewController.swift */; };
-		80C8D4A7236B291E00664FC5 /* Main.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 80C8D4A5236B291E00664FC5 /* Main.storyboard */; };
 		80C8D4A9236B291F00664FC5 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 80C8D4A8236B291F00664FC5 /* Assets.xcassets */; };
 		80C8D4AC236B291F00664FC5 /* LaunchScreen.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 80C8D4AA236B291F00664FC5 /* LaunchScreen.storyboard */; };
 		80C8D4B7236B291F00664FC5 /* ExampleTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 80C8D4B6236B291F00664FC5 /* ExampleTests.swift */; };
+		80E8F2ED238F694F00D19038 /* RELListRequestDataProcessorProtocol.swift in Sources */ = {isa = PBXBuildFile; fileRef = 80E8F2E1238F694E00D19038 /* RELListRequestDataProcessorProtocol.swift */; };
+		80E8F2EE238F694F00D19038 /* RELDataBindableObjectProtocol.swift in Sources */ = {isa = PBXBuildFile; fileRef = 80E8F2E2238F694E00D19038 /* RELDataBindableObjectProtocol.swift */; };
+		80E8F2EF238F694F00D19038 /* RELCellSelectorPriority.swift in Sources */ = {isa = PBXBuildFile; fileRef = 80E8F2E4238F694E00D19038 /* RELCellSelectorPriority.swift */; };
+		80E8F2F0238F694F00D19038 /* RELCellSelector.swift in Sources */ = {isa = PBXBuildFile; fileRef = 80E8F2E5238F694E00D19038 /* RELCellSelector.swift */; };
+		80E8F2F1238F694F00D19038 /* RELCellSelectorManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = 80E8F2E6238F694E00D19038 /* RELCellSelectorManager.swift */; };
+		80E8F2F2238F694F00D19038 /* RELCard.swift in Sources */ = {isa = PBXBuildFile; fileRef = 80E8F2E8238F694E00D19038 /* RELCard.swift */; };
+		80E8F2F3238F694F00D19038 /* RELEntity.swift in Sources */ = {isa = PBXBuildFile; fileRef = 80E8F2E9238F694E00D19038 /* RELEntity.swift */; };
+		80E8F2F4238F694F00D19038 /* RELListRequestResponseSpec.swift in Sources */ = {isa = PBXBuildFile; fileRef = 80E8F2EA238F694E00D19038 /* RELListRequestResponseSpec.swift */; };
+		80E8F2F5238F694F00D19038 /* RXCEntityListViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 80E8F2EB238F694E00D19038 /* RXCEntityListViewController.swift */; };
+		80E8F2F6238F694F00D19038 /* RELEntityListRequestSpec.swift in Sources */ = {isa = PBXBuildFile; fileRef = 80E8F2EC238F694E00D19038 /* RELEntityListRequestSpec.swift */; };
 		93883C812F2FFBF0440159D0 /* Pods_Example.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = C4390DA662FB48C50678B952 /* Pods_Example.framework */; };
 		DCF226B624BF21ED89D00AD7 /* Pods_ExampleTests.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = D5D2F9EB00A65F497155E2BC /* Pods_ExampleTests.framework */; };
 /* End PBXBuildFile section */
@@ -32,17 +41,27 @@
 		198BDC3FC4103C4637D36AD7 /* Pods-ExampleTests.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-ExampleTests.release.xcconfig"; path = "Target Support Files/Pods-ExampleTests/Pods-ExampleTests.release.xcconfig"; sourceTree = "<group>"; };
 		58B4FA3969BFADD0CFCFDF2F /* Pods-Example.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-Example.debug.xcconfig"; path = "Target Support Files/Pods-Example/Pods-Example.debug.xcconfig"; sourceTree = "<group>"; };
 		6150AE66FB4F3FF9B9CBD103 /* Pods-ExampleTests.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-ExampleTests.debug.xcconfig"; path = "Target Support Files/Pods-ExampleTests/Pods-ExampleTests.debug.xcconfig"; sourceTree = "<group>"; };
+		807198B1238F9EC90050591F /* ViewController2.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ViewController2.swift; sourceTree = "<group>"; };
 		80C8D49C236B291E00664FC5 /* Example.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = Example.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		80C8D49F236B291E00664FC5 /* AppDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppDelegate.swift; sourceTree = "<group>"; };
 		80C8D4A1236B291E00664FC5 /* SceneDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SceneDelegate.swift; sourceTree = "<group>"; };
 		80C8D4A3236B291E00664FC5 /* ViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ViewController.swift; sourceTree = "<group>"; };
-		80C8D4A6236B291E00664FC5 /* Base */ = {isa = PBXFileReference; lastKnownFileType = file.storyboard; name = Base; path = Base.lproj/Main.storyboard; sourceTree = "<group>"; };
 		80C8D4A8236B291F00664FC5 /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
 		80C8D4AB236B291F00664FC5 /* Base */ = {isa = PBXFileReference; lastKnownFileType = file.storyboard; name = Base; path = Base.lproj/LaunchScreen.storyboard; sourceTree = "<group>"; };
 		80C8D4AD236B291F00664FC5 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
 		80C8D4B2236B291F00664FC5 /* ExampleTests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = ExampleTests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
 		80C8D4B6236B291F00664FC5 /* ExampleTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ExampleTests.swift; sourceTree = "<group>"; };
 		80C8D4B8236B291F00664FC5 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
+		80E8F2E1238F694E00D19038 /* RELListRequestDataProcessorProtocol.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = RELListRequestDataProcessorProtocol.swift; sourceTree = "<group>"; };
+		80E8F2E2238F694E00D19038 /* RELDataBindableObjectProtocol.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = RELDataBindableObjectProtocol.swift; sourceTree = "<group>"; };
+		80E8F2E4238F694E00D19038 /* RELCellSelectorPriority.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = RELCellSelectorPriority.swift; sourceTree = "<group>"; };
+		80E8F2E5238F694E00D19038 /* RELCellSelector.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = RELCellSelector.swift; sourceTree = "<group>"; };
+		80E8F2E6238F694E00D19038 /* RELCellSelectorManager.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = RELCellSelectorManager.swift; sourceTree = "<group>"; };
+		80E8F2E8238F694E00D19038 /* RELCard.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = RELCard.swift; sourceTree = "<group>"; };
+		80E8F2E9238F694E00D19038 /* RELEntity.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = RELEntity.swift; sourceTree = "<group>"; };
+		80E8F2EA238F694E00D19038 /* RELListRequestResponseSpec.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = RELListRequestResponseSpec.swift; sourceTree = "<group>"; };
+		80E8F2EB238F694E00D19038 /* RXCEntityListViewController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = RXCEntityListViewController.swift; sourceTree = "<group>"; };
+		80E8F2EC238F694E00D19038 /* RELEntityListRequestSpec.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = RELEntityListRequestSpec.swift; sourceTree = "<group>"; };
 		8EF616BBDF4EB23598102D9F /* Pods-Example.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-Example.release.xcconfig"; path = "Target Support Files/Pods-Example/Pods-Example.release.xcconfig"; sourceTree = "<group>"; };
 		C4390DA662FB48C50678B952 /* Pods_Example.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = Pods_Example.framework; sourceTree = BUILT_PRODUCTS_DIR; };
 		D5D2F9EB00A65F497155E2BC /* Pods_ExampleTests.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = Pods_ExampleTests.framework; sourceTree = BUILT_PRODUCTS_DIR; };
@@ -71,6 +90,7 @@
 		80C8D493236B291E00664FC5 = {
 			isa = PBXGroup;
 			children = (
+				80E8F2DC238F694E00D19038 /* Source */,
 				80C8D49E236B291E00664FC5 /* Example */,
 				80C8D4B5236B291F00664FC5 /* ExampleTests */,
 				80C8D49D236B291E00664FC5 /* Products */,
@@ -94,7 +114,7 @@
 				80C8D49F236B291E00664FC5 /* AppDelegate.swift */,
 				80C8D4A1236B291E00664FC5 /* SceneDelegate.swift */,
 				80C8D4A3236B291E00664FC5 /* ViewController.swift */,
-				80C8D4A5236B291E00664FC5 /* Main.storyboard */,
+				807198B1238F9EC90050591F /* ViewController2.swift */,
 				80C8D4A8236B291F00664FC5 /* Assets.xcassets */,
 				80C8D4AA236B291F00664FC5 /* LaunchScreen.storyboard */,
 				80C8D4AD236B291F00664FC5 /* Info.plist */,
@@ -111,6 +131,72 @@
 			path = ExampleTests;
 			sourceTree = "<group>";
 		};
+		80E8F2DC238F694E00D19038 /* Source */ = {
+			isa = PBXGroup;
+			children = (
+				80E8F2DD238F694E00D19038 /* Extension */,
+				80E8F2E0238F694E00D19038 /* Protocol */,
+				80E8F2E3238F694E00D19038 /* CellSelectorManager */,
+				80E8F2E7238F694E00D19038 /* Model */,
+				80E8F2EA238F694E00D19038 /* RELListRequestResponseSpec.swift */,
+				80E8F2EC238F694E00D19038 /* RELEntityListRequestSpec.swift */,
+				80E8F2EB238F694E00D19038 /* RXCEntityListViewController.swift */,
+			);
+			name = Source;
+			path = ../Source;
+			sourceTree = "<group>";
+		};
+		80E8F2DD238F694E00D19038 /* Extension */ = {
+			isa = PBXGroup;
+			children = (
+				80E8F2DE238F694E00D19038 /* UIKit */,
+				80E8F2DF238F694E00D19038 /* ASDK */,
+			);
+			path = Extension;
+			sourceTree = "<group>";
+		};
+		80E8F2DE238F694E00D19038 /* UIKit */ = {
+			isa = PBXGroup;
+			children = (
+			);
+			path = UIKit;
+			sourceTree = "<group>";
+		};
+		80E8F2DF238F694E00D19038 /* ASDK */ = {
+			isa = PBXGroup;
+			children = (
+			);
+			path = ASDK;
+			sourceTree = "<group>";
+		};
+		80E8F2E0238F694E00D19038 /* Protocol */ = {
+			isa = PBXGroup;
+			children = (
+				80E8F2E1238F694E00D19038 /* RELListRequestDataProcessorProtocol.swift */,
+				80E8F2E2238F694E00D19038 /* RELDataBindableObjectProtocol.swift */,
+			);
+			path = Protocol;
+			sourceTree = "<group>";
+		};
+		80E8F2E3238F694E00D19038 /* CellSelectorManager */ = {
+			isa = PBXGroup;
+			children = (
+				80E8F2E4238F694E00D19038 /* RELCellSelectorPriority.swift */,
+				80E8F2E5238F694E00D19038 /* RELCellSelector.swift */,
+				80E8F2E6238F694E00D19038 /* RELCellSelectorManager.swift */,
+			);
+			path = CellSelectorManager;
+			sourceTree = "<group>";
+		};
+		80E8F2E7238F694E00D19038 /* Model */ = {
+			isa = PBXGroup;
+			children = (
+				80E8F2E8238F694E00D19038 /* RELCard.swift */,
+				80E8F2E9238F694E00D19038 /* RELEntity.swift */,
+			);
+			path = Model;
+			sourceTree = "<group>";
+		};
 		C3380BC8A9CC275C3DEE49EE /* Pods */ = {
 			isa = PBXGroup;
 			children = (
@@ -119,7 +205,6 @@
 				6150AE66FB4F3FF9B9CBD103 /* Pods-ExampleTests.debug.xcconfig */,
 				198BDC3FC4103C4637D36AD7 /* Pods-ExampleTests.release.xcconfig */,
 			);
-			name = Pods;
 			path = Pods;
 			sourceTree = "<group>";
 		};
@@ -218,7 +303,6 @@
 			files = (
 				80C8D4AC236B291F00664FC5 /* LaunchScreen.storyboard in Resources */,
 				80C8D4A9236B291F00664FC5 /* Assets.xcassets in Resources */,
-				80C8D4A7236B291E00664FC5 /* Main.storyboard in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -300,9 +384,19 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				80E8F2EE238F694F00D19038 /* RELDataBindableObjectProtocol.swift in Sources */,
+				80E8F2F4238F694F00D19038 /* RELListRequestResponseSpec.swift in Sources */,
+				80E8F2ED238F694F00D19038 /* RELListRequestDataProcessorProtocol.swift in Sources */,
+				80E8F2F6238F694F00D19038 /* RELEntityListRequestSpec.swift in Sources */,
+				80E8F2F2238F694F00D19038 /* RELCard.swift in Sources */,
+				80E8F2EF238F694F00D19038 /* RELCellSelectorPriority.swift in Sources */,
+				80E8F2F3238F694F00D19038 /* RELEntity.swift in Sources */,
 				80C8D4A4236B291E00664FC5 /* ViewController.swift in Sources */,
+				80E8F2F5238F694F00D19038 /* RXCEntityListViewController.swift in Sources */,
 				80C8D4A0236B291E00664FC5 /* AppDelegate.swift in Sources */,
-				80C8D4A2236B291E00664FC5 /* SceneDelegate.swift in Sources */,
+				80E8F2F1238F694F00D19038 /* RELCellSelectorManager.swift in Sources */,
+				80E8F2F0238F694F00D19038 /* RELCellSelector.swift in Sources */,
+				807198B2238F9EC90050591F /* ViewController2.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -325,14 +419,6 @@
 /* End PBXTargetDependency section */
 
 /* Begin PBXVariantGroup section */
-		80C8D4A5236B291E00664FC5 /* Main.storyboard */ = {
-			isa = PBXVariantGroup;
-			children = (
-				80C8D4A6236B291E00664FC5 /* Base */,
-			);
-			name = Main.storyboard;
-			sourceTree = "<group>";
-		};
 		80C8D4AA236B291F00664FC5 /* LaunchScreen.storyboard */ = {
 			isa = PBXVariantGroup;
 			children = (
